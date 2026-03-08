@@ -42,92 +42,162 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
   border:1px solid var(--border);color:var(--dim2);letter-spacing:.08em;}
 
 /* ══ BATTLE LAYOUT ══ */
-#battleScreen{flex-direction:row;}
-.b-left{display:flex;flex-direction:column;width:50%;height:100vh;padding:8px 4px 6px 8px;border-right:1px solid var(--border);}
-.b-right{display:flex;flex-direction:column;width:50%;height:100vh;padding:8px 8px 6px 4px;}
-.col-label{font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-align:center;padding:2px 0;flex-shrink:0;}
-.fighters-col{display:flex;flex-direction:column;gap:5px;flex:1;justify-content:center;min-height:0;}
+#battleScreen{flex-direction:column;overflow:hidden;}
 
-/* ══ FIGHTER ══ */
+/* Top bar: round + energy + commit */
+.top-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 12px;border-bottom:1px solid var(--border);flex-shrink:0;
+  background:rgba(7,8,15,.7);backdrop-filter:blur(4px);gap:8px;
+}
+.top-bar-left{display:flex;align-items:center;gap:10px;}
+.top-bar-right{display:flex;align-items:center;gap:8px;}
+.round-badge{font-family:'Cinzel',serif;font-size:.95rem;color:var(--gold);font-weight:700;}
+.round-lbl{font-size:.48rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);}
+.en-row{display:flex;align-items:center;gap:4px;}
+.en-lbl{font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);}
+.orbs{display:flex;gap:2px;flex-wrap:wrap;max-width:80px;}
+.orb{width:7px;height:7px;border-radius:50%;background:rgba(74,158,255,.12);border:1px solid rgba(74,158,255,.25);transition:all .18s;}
+.orb.on{background:var(--blue);border-color:var(--blue);box-shadow:0 0 4px rgba(74,158,255,.5);}
+.en-val{font-size:.72rem;color:var(--blue);font-weight:700;}
+.commit-btn{
+  padding:7px 18px;background:linear-gradient(135deg,#3a2a06,var(--gold));
+  border:none;border-radius:8px;color:#0a0b14;font-family:'Cinzel',serif;
+  font-size:.72rem;font-weight:600;letter-spacing:.08em;cursor:pointer;
+  transition:all .2s;box-shadow:0 3px 14px rgba(212,168,67,.2);white-space:nowrap;
+}
+.commit-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,168,67,.35);}
+.commit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.phase-lbl{font-size:.48rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--dim2);animation:blink 1.4s ease infinite;}
+@keyframes blink{0%,100%{opacity:.4}50%{opacity:.9}}
+
+/* overdrive / guard banners inline in top bar */
+.overdrive-banner{
+  padding:3px 10px;border-radius:6px;
+  background:linear-gradient(90deg,rgba(212,168,67,.1),rgba(212,168,67,.2),rgba(212,168,67,.1));
+  border:1px solid rgba(212,168,67,.35);
+  font-size:.5rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gold2);white-space:nowrap;
+  animation:overdriveGlow 1.2s ease infinite alternate;
+}
+@keyframes overdriveGlow{from{box-shadow:0 0 6px rgba(212,168,67,.2)}to{box-shadow:0 0 14px rgba(212,168,67,.5)}}
+.guard-banner{
+  padding:3px 10px;border-radius:6px;
+  background:rgba(74,158,255,.08);border:1px solid rgba(74,158,255,.3);
+  font-size:.48rem;font-weight:600;color:var(--blue);white-space:nowrap;
+}
+
+/* Arena: two columns */
+.arena{display:flex;flex:1;min-height:0;overflow:hidden;}
+.col-label{font-size:.48rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-align:center;padding:3px 0;flex-shrink:0;}
+
+/* Player side */
+.b-left{display:flex;flex-direction:column;width:55%;height:100%;padding:6px 4px 6px 8px;border-right:1px solid var(--border);}
+.fighters-col{display:flex;flex-direction:column;gap:4px;flex:1;justify-content:space-around;min-height:0;overflow:hidden;}
+
+/* Enemy side */
+.b-right{display:flex;flex-direction:column;width:45%;height:100%;padding:6px 8px 6px 4px;}
+
+/* ══ FIGHTER ROW — info + hand side by side ══ */
 .fighter{
   background:var(--surface);border:1px solid var(--border);border-radius:11px;
-  padding:7px;display:flex;gap:7px;align-items:flex-start;position:relative;
-  transition:border-color .25s,box-shadow .25s;
+  display:flex;flex-direction:row;align-items:stretch;position:relative;
+  transition:border-color .25s,box-shadow .25s;overflow:hidden;
+  flex:1;min-height:0;max-height:120px;
 }
-.enemy-fighter{cursor:pointer;}
-.enemy-fighter:hover{border-color:rgba(212,168,67,.25);}
 .fighter.dead{opacity:.25;filter:grayscale(1);pointer-events:none;}
 .fighter.taking-hit{animation:hitShake .32s ease;}
 .fighter.attacking-anim{animation:fwdPop .38s ease;}
 .fighter.healing-anim{animation:healGlow .45s ease;}
-.fighter.overdrive{border-color:rgba(212,168,67,.6)!important;box-shadow:0 0 12px rgba(212,168,67,.25);}
+.fighter.overdrive{border-color:rgba(212,168,67,.6)!important;box-shadow:0 0 10px rgba(212,168,67,.2);}
+.enemy-fighter{cursor:pointer;}
+.enemy-fighter:hover{border-color:rgba(212,168,67,.25);}
 @keyframes hitShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(6px)}}
 @keyframes fwdPop{0%,100%{transform:scale(1)}40%{transform:scale(1.1)}75%{transform:scale(.97)}}
 @keyframes healGlow{0%,100%{box-shadow:0 0 0 rgba(46,204,113,0)}50%{box-shadow:0 0 18px rgba(46,204,113,.5)}}
 
-.f-avatar{width:40px;height:40px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+/* Fighter info panel (left part of fighter row) */
+.f-info{
+  display:flex;flex-direction:row;gap:6px;align-items:center;
+  padding:7px 8px;flex-shrink:0;width:130px;
+}
+.f-avatar{width:36px;height:36px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
 .f-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
-.f-top{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
-.f-name{font-size:.62rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.role-badge{font-size:.42rem;padding:1px 4px;border-radius:3px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;}
+.f-top{display:flex;align-items:center;gap:3px;flex-wrap:wrap;}
+.f-name{font-size:.58rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;}
+.role-badge{font-size:.38rem;padding:1px 3px;border-radius:3px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;}
 .role-dps{background:rgba(231,76,60,.2);color:#e74c3c;}
 .role-subdps{background:rgba(212,168,67,.2);color:var(--gold);}
 .role-support{background:rgba(46,204,113,.2);color:#2ecc71;}
-.f-stats-row{display:flex;gap:5px;font-size:.5rem;color:var(--dim2);}
+.f-stats-row{display:flex;gap:4px;font-size:.48rem;color:var(--dim2);}
 .f-stats-row b{color:var(--text);font-weight:600;}
-.hp-lbl{font-size:.52rem;margin-top:1px;}
-.buff-row{display:flex;gap:3px;margin-top:2px;flex-wrap:wrap;}
-.buff-pip{font-size:.5rem;padding:1px 4px;border-radius:3px;background:rgba(212,168,67,.15);
-  color:var(--gold);border:1px solid rgba(212,168,67,.3);}
-.guard-pip{font-size:.5rem;padding:1px 4px;border-radius:3px;background:rgba(74,158,255,.15);
-  color:var(--blue);border:1px solid rgba(74,158,255,.3);}
-.overdrive-pip{font-size:.5rem;padding:1px 4px;border-radius:3px;background:rgba(212,168,67,.25);
-  color:var(--gold2);border:1px solid rgba(212,168,67,.5);font-weight:700;}
+.hp-lbl{font-size:.5rem;margin-top:1px;}
+.buff-row{display:flex;gap:2px;margin-top:2px;flex-wrap:wrap;}
+.buff-pip{font-size:.44rem;padding:1px 3px;border-radius:3px;background:rgba(212,168,67,.15);color:var(--gold);border:1px solid rgba(212,168,67,.3);}
+.guard-pip{font-size:.44rem;padding:1px 3px;border-radius:3px;background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);}
+.overdrive-pip{font-size:.44rem;padding:1px 3px;border-radius:3px;background:rgba(212,168,67,.25);color:var(--gold2);border:1px solid rgba(212,168,67,.5);font-weight:700;}
 
-.f-slots{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap;}
-.cslot{
-  width:34px;height:44px;border-radius:6px;
-  border:1px dashed rgba(212,168,67,.2);background:rgba(0,0,0,.2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:.5rem;color:var(--dim);transition:all .15s;position:relative;flex-shrink:0;
+/* Divider between info and hand */
+.f-divider{width:1px;background:var(--border);flex-shrink:0;align-self:stretch;}
+
+/* Hand panel — the card row inside the fighter */
+.f-hand-panel{
+  flex:1;display:flex;align-items:center;gap:5px;
+  padding:6px 8px;overflow-x:auto;min-width:0;
 }
-.cslot.over{border-color:var(--gold);background:rgba(212,168,67,.08);}
-.cslot.filled{border-style:solid;border-color:rgba(212,168,67,.35);}
-.cslot.add-slot{border-style:dashed;cursor:default;}
+.f-hand-panel::-webkit-scrollbar{height:3px;}
+.f-hand-panel::-webkit-scrollbar-thumb{background:rgba(212,168,67,.2);border-radius:2px;}
 
-.placed{width:100%;height:100%;border-radius:5px;background:var(--surface3);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;}
-.placed:hover{opacity:.7;}
-.placed-ic{font-size:.9rem;line-height:1;}
-.placed-tp{font-size:.4rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
-.placed.ultimate{background:rgba(212,168,67,.15);border:1px solid rgba(212,168,67,.4);}
+/* Drop zone inside fighter */
+.f-dropzone{
+  width:44px;height:calc(100% - 12px);min-height:60px;border-radius:8px;flex-shrink:0;
+  border:1.5px dashed rgba(212,168,67,.25);background:rgba(0,0,0,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;color:var(--dim);transition:all .15s;
+}
+.f-dropzone.over{border-color:var(--gold);background:rgba(212,168,67,.1);}
 
-/* ══ HAND ══ */
-.hand-section{flex-shrink:0;margin-top:4px;}
-.hand-lbl{font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:3px;}
-.hand-row{display:flex;gap:4px;overflow-x:auto;padding-bottom:3px;}
-.hand-row::-webkit-scrollbar{height:2px;}
-.hand-row::-webkit-scrollbar-thumb{background:rgba(212,168,67,.2);border-radius:2px;}
+/* Committed cards inside fighter */
+.placed-card{
+  width:44px;flex-shrink:0;height:calc(100% - 12px);min-height:60px;border-radius:8px;
+  background:var(--surface3);border:1px solid rgba(212,168,67,.3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;cursor:pointer;transition:opacity .15s;padding:3px;
+}
+.placed-card:hover{opacity:.7;}
+.placed-card.ultimate{background:rgba(212,168,67,.12);border-color:rgba(212,168,67,.5);}
+.placed-ic{font-size:1rem;line-height:1;}
+.placed-nm{font-size:.42rem;font-weight:700;text-align:center;line-height:1.2;color:var(--text);}
+.placed-tp{font-size:.38rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
 
-/* ══ CARDS ══ */
+/* ══ HAND CARDS (in hand below, per fighter) ══ */
 .card{
-  width:54px;min-height:72px;background:var(--surface2);border:1px solid rgba(255,255,255,.08);
-  border-radius:9px;padding:5px 4px;cursor:grab;transition:transform .15s,border-color .15s,opacity .15s;
+  width:52px;height:76px;background:var(--surface2);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:5px 4px 4px;cursor:grab;
+  transition:transform .15s,border-color .15s,opacity .15s;
   display:flex;flex-direction:column;align-items:center;gap:2px;
   flex-shrink:0;position:relative;user-select:none;touch-action:none;
 }
-.card:hover:not(.cdis){transform:translateY(-5px);border-color:rgba(212,168,67,.4);}
-.card.cdis{opacity:.35;cursor:not-allowed;}
-.card.dragging{opacity:.35;transform:scale(.9);}
-.card.ultimate-card{border-color:rgba(212,168,67,.5);background:rgba(212,168,67,.06);}
-.card-cost{position:absolute;top:3px;right:3px;width:13px;height:13px;border-radius:50%;
-  background:var(--blue);color:#fff;font-size:.52rem;font-weight:700;
-  display:flex;align-items:center;justify-content:center;}
-.card-ic{font-size:1.15rem;line-height:1;}
-.card-nm{font-size:.48rem;font-weight:700;text-align:center;line-height:1.2;}
-.card-tp{font-size:.42rem;letter-spacing:.05em;text-transform:uppercase;}
-.card-vl{font-size:.62rem;font-weight:700;font-family:'Cinzel',serif;}
-.card-ow{font-size:.42rem;color:var(--dim);}
+.card:hover:not(.cdis){transform:translateY(-6px);border-color:rgba(212,168,67,.5);box-shadow:0 6px 16px rgba(0,0,0,.4);}
+.card.cdis{opacity:.3;cursor:not-allowed;}
+.card.dragging{opacity:.3;transform:scale(.88);}
+.card.ultimate-card{border-color:rgba(212,168,67,.55);background:rgba(212,168,67,.07);}
+.card-cost{
+  position:absolute;top:3px;right:3px;width:15px;height:15px;border-radius:50%;
+  background:var(--blue);color:#fff;font-size:.55rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.card-ic{font-size:1.25rem;line-height:1;margin-top:2px;}
+.card-nm{font-size:.5rem;font-weight:700;text-align:center;line-height:1.2;color:var(--text);}
+.card-tp{font-size:.42rem;letter-spacing:.04em;text-transform:uppercase;}
+.card-vl{font-size:.68rem;font-weight:700;font-family:'Cinzel',serif;}
+.card-ow{font-size:.4rem;color:var(--dim);}
+
+/* Enemy fighter — no hand panel, cleaner */
+.enemy-fighter .f-info{width:100%;}
+.enemy-fighter{max-height:none;flex-direction:column;padding:8px;gap:4px;cursor:pointer;}
+.enemy-fighter .f-info{padding:0;width:100%;}
 
 /* combo flash */
 .combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -248,29 +318,31 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
 
 <!-- BATTLE -->
 <div class="screen" id="battleScreen">
-  <div class="b-left">
-    <div class="col-label">Your Team</div>
-    <div class="fighters-col" id="playerCol"></div>
-    <div class="hand-section">
-      <div class="hand-lbl">Hand — drag cards to your fighters (unlimited per fighter)</div>
-      <div class="hand-row" id="handRow"></div>
-    </div>
-  </div>
-  <div class="b-right">
-    <div class="col-label">Enemy Team <span style="font-size:.46rem">(tap to see cards)</span></div>
-    <div class="fighters-col" id="enemyCol"></div>
-    <div class="round-row">
-      <div><div class="round-lbl">Round</div><div class="round-num" id="roundNum">1</div></div>
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div><div class="round-lbl">Round</div><div class="round-badge" id="roundNum">1</div></div>
       <div class="en-row">
         <div class="en-lbl">Energy</div>
         <div class="orbs" id="orbsEl"></div>
         <div class="en-val" id="enVal">10</div>
       </div>
+      <div id="overdriveBar" style="display:none" class="overdrive-banner">⚡ OVERDRIVE +10%</div>
+      <div id="guardBar" style="display:none" class="guard-banner">🛡️ Guard T1</div>
+      <div class="phase-lbl" id="phaseLbl">Drag cards → Commit</div>
     </div>
-    <div id="overdriveBar" style="display:none" class="overdrive-banner">⚡ OVERDRIVE — All Stats +10% This Turn!</div>
-    <div id="guardBar" style="display:none" class="guard-banner">🛡️ Guard Active — DEF counts as highest stat (Turn 1)</div>
-    <div class="phase-lbl" id="phaseLbl">Drag cards → Commit ⚔️</div>
-    <button class="commit-btn" id="commitBtn" onclick="commitRound()">⚔️ Commit Round</button>
+    <div class="top-bar-right">
+      <button class="commit-btn" id="commitBtn" onclick="commitRound()">⚔️ Commit Round</button>
+    </div>
+  </div>
+  <div class="arena">
+    <div class="b-left">
+      <div class="col-label">Your Team — drag cards onto each fighter</div>
+      <div class="fighters-col" id="playerCol"></div>
+    </div>
+    <div class="b-right">
+      <div class="col-label">Enemy Team <span style="opacity:.6">(tap to peek cards)</span></div>
+      <div class="fighters-col" id="enemyCol"></div>
+    </div>
   </div>
 </div>
 
@@ -836,114 +908,134 @@ function typeCol(t){return t==='attack'?'#ff6060':t==='heal'?'#2ecc71':t==='defe
 function renderFighter(f, isPlayer){
   const pct=Math.max(0,f.hp/f.maxHp*100);
   const boxCol=elC(f.el);
-
-  let slotsHtml='';
-  if(isPlayer){
-    slotsHtml='<div class="f-slots">';
-    f.committed.forEach((c,i)=>{
-      const tc=typeCol(c.t);
-      const isUlt=c.ult?'ultimate':'';
-      slotsHtml+=`<div class="cslot filled" id="slot-${f.id}-${i}">
-        <div class="placed ${isUlt}" onclick="unplace('${f.id}',${i})" title="Click to remove">
-          <div class="placed-ic">${c.ic}</div>
-          <div class="placed-tp" style="color:${tc}">${c.ult?'ULT':c.t.toUpperCase()}</div>
-        </div>
-      </div>`;
-    });
-    slotsHtml+=`<div class="cslot add-slot" id="slot-${f.id}-new"
-      ondragover="event.preventDefault();this.classList.add('over')"
-      ondragleave="this.classList.remove('over')"
-      ondrop="dropSlot(event,'${f.id}')">+</div>`;
-    slotsHtml+='</div>';
-  } else {
-    slotsHtml=`<div class="f-slots"><div class="cslot" style="visibility:hidden"></div></div>`;
-  }
+  const isOD=f.overdrive?' overdrive':'';
 
   // Buff / Guard / Overdrive pips
   let pips='';
-  if(f.buffRounds>0) pips+=`<span class="buff-pip">⬆️ATK ×${f.atkMult.toFixed(2)} (${f.buffRounds}r)</span>`;
-  if(f.guard)        pips+=`<span class="guard-pip">🛡️Guard</span>`;
+  if(f.buffRounds>0) pips+=`<span class="buff-pip">⬆️×${f.atkMult.toFixed(1)}(${f.buffRounds}r)</span>`;
+  if(f.guard)        pips+=`<span class="guard-pip">🛡️Grd</span>`;
   if(f.overdrive)    pips+=`<span class="overdrive-pip">⚡OD</span>`;
   const buffHtml=pips?`<div class="buff-row">${pips}</div>`:'';
 
-  const isOD=f.overdrive?' overdrive':'';
-
-  return`<div class="fighter${isPlayer?'':' enemy-fighter'}${f.alive?'':' dead'}${isOD}" id="f-${f.id}"
-    ${isPlayer?'':` onclick="showPeek('${f.id}',event)"`}>
-    <div class="f-avatar" style="background:${boxCol}20;border:2px solid ${boxCol}60">${f.emoji}</div>
-    <div class="f-body">
-      <div class="f-top">
-        <span class="f-name" style="color:${boxCol}">${f.name}</span>
-        ${isPlayer?`<span class="role-badge role-${f.role}">${f.role}</span>`:''}
+  // Info panel (shared by both player and enemy)
+  const infoHtml=`
+    <div class="f-info">
+      <div class="f-avatar" style="background:${boxCol}20;border:2px solid ${boxCol}55">${f.emoji}</div>
+      <div class="f-body">
+        <div class="f-top">
+          <span class="f-name" style="color:${boxCol}">${f.name}</span>
+          <span class="role-badge role-${f.role}">${f.role==='subdps'?'Sub':f.role==='support'?'Supp':f.role.toUpperCase()}</span>
+        </div>
+        <div class="f-stats-row"><span>ATK <b>${f.atk}</b></span><span>DEF <b>${f.def}</b></span></div>
+        <div class="hp-lbl" style="color:${hpColor(pct)}">${Math.max(0,f.hp)}/${f.maxHp}${f.shield>0?` 🛡️${f.shield}`:''}</div>
+        ${buffHtml}
       </div>
-      <div class="f-stats-row"><span>ATK <b>${f.atk}</b></span><span>DEF <b>${f.def}</b></span></div>
-      <div class="hp-lbl" style="color:${hpColor(pct)}">${Math.max(0,f.hp)}/${f.maxHp}${f.shield>0?` 🛡️${f.shield}`:''}</div>
-      ${buffHtml}
-      ${slotsHtml}
+    </div>`;
+
+  if(!isPlayer){
+    // Enemy: simple card, no hand panel
+    return`<div class="fighter enemy-fighter${f.alive?'':' dead'}${isOD}" id="f-${f.id}" onclick="showPeek('${f.id}',event)">
+      ${infoHtml}
+    </div>`;
+  }
+
+  // Player: info panel + divider + inline hand
+  // Hand cards for this fighter
+  const myCards = G.hand.filter(c=>c.ownerName===f.name);
+  let handHtml = myCards.map(hc=>{
+    const canUse = G.energy>=hc.c && G.phase==='commit' && !G.done;
+    const tc=typeCol(hc.t);
+    const val = hc.t==='attack'||hc.t==='debuff'
+      ? `${hc.v}`
+      : hc.t==='heal'||hc.t==='defend'
+      ? `${hc.v}`
+      : hc.bv ? `+${Math.round(hc.bv*100)}%` : '';
+    const isUlt=hc.ult;
+    return`<div class="card${canUse?'':' cdis'}${isUlt?' ultimate-card':''}" id="hc-${hc.hid}"
+      draggable="${canUse}"
+      ondragstart="dStart(event,'${hc.hid}')"
+      ondragend="dEnd(event)"
+      title="${hc.n}${isUlt?' [ULT]':''} · Cost ${hc.c}">
+      <div class="card-cost">${hc.c}</div>
+      <div class="card-ic">${hc.ic}</div>
+      <div class="card-nm">${hc.n}</div>
+      <div class="card-tp" style="color:${tc}">${isUlt?'⭐ULT':hc.t.toUpperCase()}</div>
+      <div class="card-vl" style="color:${tc}">${val}</div>
+    </div>`;
+  }).join('');
+
+  // Committed cards for this fighter
+  let committedHtml = f.committed.map((c,i)=>{
+    const tc=typeCol(c.t);
+    return`<div class="placed-card${c.ult?' ultimate':''}" onclick="unplace('${f.id}',${i})" title="Click to remove · ${c.n}">
+      <div class="placed-ic">${c.ic}</div>
+      <div class="placed-nm">${c.n}</div>
+      <div class="placed-tp" style="color:${tc}">${c.ult?'ULT':c.t.toUpperCase()}</div>
+    </div>`;
+  }).join('');
+
+  return`<div class="fighter${f.alive?'':' dead'}${isOD}" id="f-${f.id}">
+    ${infoHtml}
+    <div class="f-divider"></div>
+    <div class="f-hand-panel"
+      ondragover="event.preventDefault();this.classList.add('over')"
+      ondragleave="this.classList.remove('over')"
+      ondrop="dropSlot(event,'${f.id}');this.classList.remove('over')">
+      ${committedHtml}
+      <div class="f-dropzone${f.committed.length===0?' over':''}" id="slot-${f.id}-new"
+        ondragover="event.preventDefault();this.classList.add('over')"
+        ondragleave="this.classList.remove('over')"
+        ondrop="dropSlot(event,'${f.id}');this.classList.remove('over')">
+        ${f.committed.length===0?'drop<br>here':'＋'}
+      </div>
+      ${handHtml}
     </div>
   </div>`;
 }
 
 function renderCard(hc){
-  const canUse=G.energy>=hc.c&&G.phase==='commit'&&!G.done;
+  // Legacy: kept for peek modal only
   const tc=typeCol(hc.t);
   const val=hc.t==='attack'||hc.t==='debuff'?`⚔️${hc.v||''}`:hc.t==='heal'||hc.t==='defend'?`${hc.ic}${hc.v||''}`:hc.bv?`+${Math.round(hc.bv*100)}%`:'';
-  const isUlt=hc.ult;
-  return`<div class="card${canUse?'':' cdis'}${isUlt?' ultimate-card':''}" id="hc-${hc.hid}"
-    draggable="${canUse}"
-    ondragstart="dStart(event,'${hc.hid}')"
-    ondragend="dEnd(event)"
-    title="${hc.n}${isUlt?' [ULTIMATE]':''} · Cost ${hc.c}">
+  return`<div class="card" style="cursor:default${hc.ult?';border-color:rgba(212,168,67,.5)':''}">
     <div class="card-cost">${hc.c}</div>
     <div class="card-ic">${hc.ic}</div>
     <div class="card-nm">${hc.n}</div>
-    <div class="card-tp" style="color:${tc}">${isUlt?'⭐ULT':hc.t.toUpperCase()}</div>
+    <div class="card-tp" style="color:${tc}">${hc.ult?'⭐ULT':hc.t.toUpperCase()}</div>
     <div class="card-vl" style="color:${tc}">${val}</div>
-    <div class="card-ow">${hc.ownerName.split(' ')[0]}</div>
   </div>`;
 }
 
 function renderAll(){
+  // Cards are rendered inline inside each fighter via renderFighter
   document.getElementById('playerCol').innerHTML=G.player.map(f=>renderFighter(f,true)).join('');
   document.getElementById('enemyCol').innerHTML=G.enemy.map(f=>renderFighter(f,false)).join('');
-  document.getElementById('handRow').innerHTML=G.hand.map(renderCard).join('');
   document.getElementById('roundNum').textContent=G.round;
 
   const orbs=document.getElementById('orbsEl');
   orbs.innerHTML=Array(G.maxE).fill(0).map((_,i)=>`<div class="orb${i<G.energy?' on':''}"></div>`).join('');
   document.getElementById('enVal').textContent=G.energy;
 
-  // FIX 3: Overdrive banner
   const isOD = G.energy >= G.maxE;
   document.getElementById('overdriveBar').style.display = isOD ? 'block' : 'none';
 
-  // Guard banner (round 1 only for Guard holders)
   const hasGuard = G.player.some(f=>f.guard);
   document.getElementById('guardBar').style.display = (hasGuard&&G.round===1) ? 'block' : 'none';
 
   const committing=G.phase==='commit';
   document.getElementById('commitBtn').disabled=!committing||G.done;
   document.getElementById('phaseLbl').textContent=committing
-    ?'Drag cards to fighters → Commit ⚔️'
-    :'Resolving round...';
+    ?'Drag cards → Commit ⚔️'
+    :'Resolving...';
 }
 
 function updateFighterDOM(f){
   const el=document.getElementById('f-'+f.id);if(!el)return;
-  const pct=Math.max(0,f.hp/f.maxHp*100);
-  const lbl=el.querySelector('.hp-lbl');
-  if(lbl){lbl.textContent=`${Math.max(0,f.hp)}/${f.maxHp}${f.shield>0?` 🛡️${f.shield}`:''}`;lbl.style.color=hpColor(pct);}
-  if(!f.alive) el.classList.add('dead');
-  const buffRow=el.querySelector('.buff-row');
-  if(buffRow){
-    let pips='';
-    if(f.buffRounds>0) pips+=`<span class="buff-pip">⬆️ATK ×${f.atkMult.toFixed(2)} (${f.buffRounds}r)</span>`;
-    if(f.guard)        pips+=`<span class="guard-pip">🛡️Guard</span>`;
-    if(f.overdrive)    pips+=`<span class="overdrive-pip">⚡OD</span>`;
-    buffRow.innerHTML=pips;
-  }
-  if(f.overdrive) el.classList.add('overdrive');
-  else el.classList.remove('overdrive');
+  const isPlayer=G.player.some(x=>x.id===f.id);
+  // Re-render the full fighter since hand is inline
+  const tmp=document.createElement('div');
+  tmp.innerHTML=renderFighter(f,isPlayer);
+  el.replaceWith(tmp.firstElementChild);
 }
 
 // ══════════════════════════════════════
@@ -951,16 +1043,16 @@ function updateFighterDOM(f){
 // ══════════════════════════════════════
 let dragId=null;
 function dStart(e,hid){dragId=hid;setTimeout(()=>{const el=document.getElementById('hc-'+hid);if(el)el.classList.add('dragging');},0);e.dataTransfer.setData('text/plain',hid);}
-function dEnd(e){if(dragId){const el=document.getElementById('hc-'+dragId);if(el)el.classList.remove('dragging');}dragId=null;document.querySelectorAll('.cslot').forEach(s=>s.classList.remove('over'));}
-function dropSlot(e,fid){e.preventDefault();const hid=e.dataTransfer.getData('text/plain')||dragId;if(hid)placeCard(hid,fid);document.querySelectorAll('.cslot').forEach(s=>s.classList.remove('over'));}
+function dEnd(e){if(dragId){const el=document.getElementById('hc-'+dragId);if(el)el.classList.remove('dragging');}dragId=null;document.querySelectorAll('.f-dropzone,.f-hand-panel').forEach(s=>s.classList.remove('over'));}
+function dropSlot(e,fid){e.preventDefault();const hid=e.dataTransfer.getData('text/plain')||dragId;if(hid)placeCard(hid,fid);document.querySelectorAll('.f-dropzone,.f-hand-panel').forEach(s=>s.classList.remove('over'));}
 
 function placeCard(hid,fid){
   const hc=G.hand.find(c=>c.hid===hid);
   const f=G.player.find(x=>x.id===fid);
   if(!hc||!f||!f.alive) return;
   if(hc.ownerName!==f.name){
-    const slot=document.getElementById('slot-'+fid+'-new');
-    if(slot){slot.style.borderColor='var(--red)';setTimeout(()=>slot.style.borderColor='',600);}
+    const panel=document.querySelector(`#f-${fid} .f-hand-panel`);
+    if(panel){panel.style.background='rgba(231,76,60,.1)';setTimeout(()=>panel.style.background='',600);}
     return;
   }
   if(G.energy<hc.c) return;
@@ -996,7 +1088,7 @@ document.addEventListener('touchmove',e=>{
   if(!tCard||!tClone) return;
   const t=e.touches[0];
   tClone.style.left=(t.clientX-27)+'px';tClone.style.top=(t.clientY-36)+'px';
-  document.querySelectorAll('.cslot').forEach(s=>{
+  document.querySelectorAll('.f-dropzone,.f-hand-panel').forEach(s=>{
     const r=s.getBoundingClientRect();
     s.classList.toggle('over',t.clientX>=r.left&&t.clientX<=r.right&&t.clientY>=r.top&&t.clientY<=r.bottom);
   });
@@ -1006,13 +1098,16 @@ document.addEventListener('touchend',e=>{
   if(tClone){tClone.remove();tClone=null;}
   const t=e.changedTouches[0];
   const tgt=document.elementFromPoint(t.clientX,t.clientY);
-  const slot=tgt&&tgt.closest('.cslot');
-  if(slot){
-    const raw=slot.id.replace('slot-','').replace('-new','');
-    const fid=raw.split('-').slice(0,-1).join('-')||raw;
-    placeCard(tCard,fid);
+  // Find fighter from dropzone, hand panel, or fighter element itself
+  const dropTarget=tgt&&(tgt.closest('.f-dropzone')||tgt.closest('.f-hand-panel')||tgt.closest('.fighter'));
+  if(dropTarget){
+    const fighter=dropTarget.closest('.fighter');
+    if(fighter){
+      const fid=fighter.id.replace('f-','');
+      placeCard(tCard,fid);
+    }
   }
-  document.querySelectorAll('.cslot').forEach(s=>s.classList.remove('over'));
+  document.querySelectorAll('.f-dropzone,.f-hand-panel').forEach(s=>s.classList.remove('over'));
   tCard=null;
 },{passive:true});
 
@@ -1315,7 +1410,7 @@ function showPeek(fid,e){
   e.stopPropagation();
   const f=G.enemy.find(x=>x.id===fid);if(!f)return;
   const peek=document.getElementById('peekEl');
-  document.getElementById('peekTitle').textContent=`${f.emoji} ${f.name}'s Cards`;
+  document.getElementById('peekTitle').textContent=`${f.emoji} ${f.name} · ${f.role.toUpperCase()}`;
   document.getElementById('peekCards').innerHTML=f.cardPool.map(c=>{
     const tc=typeCol(c.t);
     const val=c.t==='attack'||c.t==='debuff'?`⚔️${c.v}`:c.t==='heal'||c.t==='defend'?`${c.ic}${c.v}`:c.bv?`+${Math.round(c.bv*100)}%`:'';
@@ -1327,7 +1422,7 @@ function showPeek(fid,e){
       <div class="card-vl" style="color:${tc}">${val}</div>
     </div>`;
   }).join('');
-  const x=Math.min(e.clientX+4,window.innerWidth-240),y=Math.min(e.clientY+4,window.innerHeight-220);
+  const x=Math.min(e.clientX+4,window.innerWidth-240),y=Math.min(e.clientY+4,window.innerHeight-260);
   peek.style.left=x+'px';peek.style.top=y+'px';peek.style.display='block';
 }
 document.addEventListener('click',e=>{
