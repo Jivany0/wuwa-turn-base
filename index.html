@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>WuWa Battle</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080f;--surface:#0f1120;--surface2:#161829;--surface3:#1e2138;
+  --border:rgba(255,255,255,0.06);--gold:#d4a843;--gold2:#f0c96a;
+  --text:#e8e4dc;--dim:#4a4860;--dim2:#7a7890;
+  --green:#2ecc71;--red:#e74c3c;--blue:#4a9eff;
+  --Spectro:#e8d84a;--Havoc:#c060d8;--Aero:#4ad0c0;
+  --Glacio:#70b8f0;--Electro:#9070f0;--Fusion:#f07840;--Physical:#cccccc;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
+  width:100vw;height:100vh;overflow:hidden;
+  background-image:
+    radial-gradient(ellipse at 15% 60%,rgba(90,50,160,.08) 0%,transparent 55%),
+    radial-gradient(ellipse at 85% 20%,rgba(212,168,67,.05) 0%,transparent 50%);}
+
+.screen{display:none;width:100vw;height:100vh;}
+.screen.active{display:flex;flex-direction:column;}
+
+/* ══ TITLE ══ */
+#titleScreen{align-items:center;justify-content:center;gap:16px;padding:30px 20px;text-align:center;}
+.title-logo{font-family:'Cinzel',serif;font-size:clamp(2.8rem,9vw,5.5rem);font-weight:900;
+  background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 30px rgba(212,168,67,.45));letter-spacing:.06em;line-height:1;}
+.title-sub{font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;color:var(--dim);margin-top:-8px;}
+.title-desc{font-size:.86rem;color:var(--dim2);max-width:380px;line-height:1.7;}
+.start-btn{padding:13px 44px;background:linear-gradient(135deg,#7a5a10,var(--gold));
+  border:none;border-radius:10px;color:#0a0b14;font-family:'Cinzel',serif;
+  font-size:.95rem;font-weight:600;letter-spacing:.1em;cursor:pointer;
+  transition:all .25s;box-shadow:0 4px 24px rgba(212,168,67,.25);}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(212,168,67,.4);}
+
+/* ══ BATTLE LAYOUT ══ */
+#battleScreen{flex-direction:row;}
+.b-left{display:flex;flex-direction:column;width:50%;height:100vh;padding:8px 4px 6px 8px;border-right:1px solid var(--border);}
+.b-right{display:flex;flex-direction:column;width:50%;height:100vh;padding:8px 8px 6px 4px;}
+.col-label{font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-align:center;padding:2px 0;flex-shrink:0;}
+.fighters-col{display:flex;flex-direction:column;gap:5px;flex:1;justify-content:center;min-height:0;}
+
+/* ══ FIGHTER ══ */
+.fighter{
+  background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:7px;display:flex;gap:7px;align-items:flex-start;position:relative;
+  transition:border-color .25s,box-shadow .25s;
+}
+.enemy-fighter{cursor:pointer;}
+.enemy-fighter:hover{border-color:rgba(212,168,67,.25);}
+.fighter.dead{opacity:.25;filter:grayscale(1);pointer-events:none;}
+.fighter.taking-hit{animation:hitShake .32s ease;}
+.fighter.attacking-anim{animation:fwdPop .38s ease;}
+.fighter.healing-anim{animation:healGlow .45s ease;}
+@keyframes hitShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(6px)}}
+@keyframes fwdPop{0%,100%{transform:scale(1)}40%{transform:scale(1.1)}75%{transform:scale(.97)}}
+@keyframes healGlow{0%,100%{box-shadow:0 0 0 rgba(46,204,113,0)}50%{box-shadow:0 0 18px rgba(46,204,113,.5)}}
+
+.f-avatar{width:40px;height:40px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+.f-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.f-top{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+.f-name{font-size:.62rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.role-badge{font-size:.42rem;padding:1px 4px;border-radius:3px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;}
+.role-dps{background:rgba(231,76,60,.2);color:#e74c3c;}
+.role-subdps{background:rgba(212,168,67,.2);color:var(--gold);}
+.role-support{background:rgba(46,204,113,.2);color:#2ecc71;}
+.f-stats-row{display:flex;gap:5px;font-size:.5rem;color:var(--dim2);}
+.f-stats-row b{color:var(--text);font-weight:600;}
+.hp-lbl{font-size:.52rem;margin-top:1px;}
+/* buff indicator */
+.buff-row{display:flex;gap:3px;margin-top:2px;flex-wrap:wrap;}
+.buff-pip{font-size:.5rem;padding:1px 4px;border-radius:3px;background:rgba(212,168,67,.15);
+  color:var(--gold);border:1px solid rgba(212,168,67,.3);}
+
+/* card slots — unlimited, wrap */
+.f-slots{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap;}
+.cslot{
+  width:34px;height:44px;border-radius:6px;
+  border:1px dashed rgba(212,168,67,.2);background:rgba(0,0,0,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.5rem;color:var(--dim);transition:all .15s;position:relative;flex-shrink:0;
+}
+.cslot.over{border-color:var(--gold);background:rgba(212,168,67,.08);}
+.cslot.filled{border-style:solid;border-color:rgba(212,168,67,.35);}
+/* add-more slot */
+.cslot.add-slot{border-style:dashed;cursor:default;}
+
+.placed{width:100%;height:100%;border-radius:5px;background:var(--surface3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;}
+.placed:hover{opacity:.7;}
+.placed-ic{font-size:.9rem;line-height:1;}
+.placed-tp{font-size:.4rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.placed-own{font-size:.4rem;color:var(--dim);}
+/* ultimate glow */
+.placed.ultimate{background:rgba(212,168,67,.15);border:1px solid rgba(212,168,67,.4);}
+
+/* ══ HAND ══ */
+.hand-section{flex-shrink:0;margin-top:4px;}
+.hand-lbl{font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:3px;}
+.hand-row{display:flex;gap:4px;overflow-x:auto;padding-bottom:3px;}
+.hand-row::-webkit-scrollbar{height:2px;}
+.hand-row::-webkit-scrollbar-thumb{background:rgba(212,168,67,.2);border-radius:2px;}
+
+/* ══ CARDS ══ */
+.card{
+  width:54px;min-height:72px;background:var(--surface2);border:1px solid rgba(255,255,255,.08);
+  border-radius:9px;padding:5px 4px;cursor:grab;transition:transform .15s,border-color .15s,opacity .15s;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  flex-shrink:0;position:relative;user-select:none;touch-action:none;
+}
+.card:hover:not(.cdis){transform:translateY(-5px);border-color:rgba(212,168,67,.4);}
+.card.cdis{opacity:.35;cursor:not-allowed;}
+.card.dragging{opacity:.35;transform:scale(.9);}
+.card.ultimate-card{border-color:rgba(212,168,67,.5);background:rgba(212,168,67,.06);}
+.card-cost{position:absolute;top:3px;right:3px;width:13px;height:13px;border-radius:50%;
+  background:var(--blue);color:#fff;font-size:.52rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;}
+.card-ic{font-size:1.15rem;line-height:1;}
+.card-nm{font-size:.48rem;font-weight:700;text-align:center;line-height:1.2;}
+.card-tp{font-size:.42rem;letter-spacing:.05em;text-transform:uppercase;}
+.card-vl{font-size:.62rem;font-weight:700;font-family:'Cinzel',serif;}
+.card-ow{font-size:.42rem;color:var(--dim);}
+
+/* combo flash */
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Cinzel',serif;font-size:1.4rem;font-weight:900;color:var(--gold);
+  text-shadow:0 0 20px rgba(212,168,67,.8);pointer-events:none;z-index:800;
+  animation:comboAnim .9s ease forwards;}
+@keyframes comboAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}
+  30%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}
+  70%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
+
+/* ══ RIGHT PANEL ══ */
+.round-row{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 4px;flex-shrink:0;}
+.round-num{font-family:'Cinzel',serif;font-size:1.1rem;color:var(--gold);}
+.round-lbl{font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);}
+.en-row{display:flex;align-items:center;gap:3px;}
+.en-lbl{font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);}
+.orbs{display:flex;gap:2px;flex-wrap:wrap;max-width:90px;}
+.orb{width:8px;height:8px;border-radius:50%;background:rgba(74,158,255,.12);border:1px solid rgba(74,158,255,.25);transition:all .18s;}
+.orb.on{background:var(--blue);border-color:var(--blue);box-shadow:0 0 4px rgba(74,158,255,.5);}
+.en-val{font-size:.68rem;color:var(--blue);font-weight:700;}
+
+.phase-lbl{font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dim2);text-align:center;padding:2px 0;flex-shrink:0;
+  animation:blink 1.4s ease infinite;}
+@keyframes blink{0%,100%{opacity:.4}50%{opacity:.9}}
+
+.commit-btn{
+  width:100%;padding:10px;background:linear-gradient(135deg,#3a2a06,var(--gold));
+  border:none;border-radius:9px;color:#0a0b14;font-family:'Cinzel',serif;
+  font-size:.82rem;font-weight:600;letter-spacing:.08em;cursor:pointer;
+  transition:all .2s;box-shadow:0 3px 14px rgba(212,168,67,.2);flex-shrink:0;
+}
+.commit-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,168,67,.35);}
+.commit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+/* ══ PROJECTOR ══ */
+#projLayer{position:fixed;inset:0;pointer-events:none;z-index:500;}
+.proj{position:fixed;pointer-events:none;transition:left .36s ease,top .36s ease,transform .36s ease,opacity .18s ease;}
+
+/* ══ DMG FLOATS ══ */
+.dmg-float{position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  font-family:'Cinzel',serif;font-weight:600;font-size:.9rem;
+  pointer-events:none;animation:floatUp .85s ease forwards;z-index:300;white-space:nowrap;}
+.dmg-float.dmg{color:#ff5555;}
+.dmg-float.crit{color:#ff9900;font-size:1.15rem;}
+.dmg-float.heal{color:#2ecc71;}
+.dmg-float.buff{color:var(--gold);}
+.dmg-float.resist{color:#88aaff;}
+.dmg-float.ult{color:var(--gold2);font-size:1.3rem;}
+@keyframes floatUp{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-42px)}}
+
+/* ══ PEEK ══ */
+.peek{position:fixed;z-index:700;background:var(--surface2);
+  border:1px solid rgba(212,168,67,.3);border-radius:12px;padding:10px;
+  min-width:190px;max-width:280px;box-shadow:0 12px 40px rgba(0,0,0,.75);
+  animation:peekIn .18s ease;}
+@keyframes peekIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.peek-title{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+.peek-cards{display:flex;flex-wrap:wrap;gap:4px;}
+
+/* ══ RESULT ══ */
+.result-ov{display:none;position:fixed;inset:0;z-index:900;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(10px);align-items:center;justify-content:center;}
+.result-ov.show{display:flex;}
+.result-box{background:var(--surface2);border:1px solid rgba(212,168,67,.3);
+  border-radius:20px;padding:38px 46px;text-align:center;
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+.res-icon{font-size:2.8rem;margin-bottom:8px;}
+.res-title{font-family:'Cinzel',serif;font-size:1.9rem;font-weight:900;margin-bottom:5px;}
+.res-title.win{background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.res-title.lose{color:var(--red);}
+.res-sub{color:var(--dim2);font-size:.86rem;margin-bottom:20px;}
+.again-btn{padding:11px 34px;background:linear-gradient(135deg,#7a5a10,var(--gold));
+  border:none;border-radius:10px;color:#0a0b14;font-family:'Cinzel',serif;
+  font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.again-btn:hover{transform:translateY(-2px);}
+</style>
+</head>
+<body>
+<div id="projLayer"></div>
+
+<!-- TITLE -->
+<div class="screen active" id="titleScreen">
+  <div class="title-logo">WuWa Battle</div>
+  <div class="title-sub">Card Combat · Beta</div>
+  <div class="title-desc">3v3 · drag cards to commit · highest DEF strikes first · unused cards carry over · combos deal bonus damage</div>
+  <button class="start-btn" onclick="startBattle()">⚡ Start Battle</button>
+  <div style="font-size:.6rem;color:var(--dim);margin-top:-6px;">Teams randomly assigned · roles based on WuWa</div>
+</div>
+
+<!-- BATTLE -->
+<div class="screen" id="battleScreen">
+  <div class="b-left">
+    <div class="col-label">Your Team</div>
+    <div class="fighters-col" id="playerCol"></div>
+    <div class="hand-section">
+      <div class="hand-lbl">Hand — drag cards to your fighters (unlimited per fighter)</div>
+      <div class="hand-row" id="handRow"></div>
+    </div>
+  </div>
+  <div class="b-right">
+    <div class="col-label">Enemy Team <span style="font-size:.46rem">(tap to see cards)</span></div>
+    <div class="fighters-col" id="enemyCol"></div>
+    <div class="round-row">
+      <div><div class="round-lbl">Round</div><div class="round-num" id="roundNum">1</div></div>
+      <div class="en-row">
+        <div class="en-lbl">Energy</div>
+        <div class="orbs" id="orbsEl"></div>
+        <div class="en-val" id="enVal">10</div>
+      </div>
+    </div>
+    <div class="phase-lbl" id="phaseLbl">Drag cards → Commit ⚔️</div>
+    <button class="commit-btn" id="commitBtn" onclick="commitRound()">⚔️ Commit Round</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="result-ov" id="resultOv">
+  <div class="result-box">
+    <div class="res-icon" id="resIcon">🏆</div>
+    <div class="res-title" id="resTitle">Victory!</div>
+    <div class="res-sub" id="resSub"></div>
+    <button class="again-btn" onclick="goTitle()">Play Again</button>
+  </div>
+</div>
+
+<!-- PEEK -->
+<div class="peek" id="peekEl" style="display:none">
+  <div class="peek-title" id="peekTitle"></div>
+  <div class="peek-cards" id="peekCards"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════
+const EL_VAR={Spectro:'--Spectro',Havoc:'--Havoc',Aero:'--Aero',Glacio:'--Glacio',Electro:'--Electro',Fusion:'--Fusion',Physical:'--Physical'};
+// Same element = resistance (-10% dmg), no weakness bonuses
+const RESISTANCE=0.9; // same element attacker vs same element defender
+
+const ROLE_ST={
+  dps:    {hp:[300,320], atk:[70,100],def:[30,35]},
+  subdps: {hp:[400,420], atk:[55,80], def:[50,60]},
+  support:{hp:[500,520], atk:[30,45], def:[90,100]},
+};
+
+// ══════════════════════════════════════
+// RESONATOR DATA — all 46 with roles
+// ══════════════════════════════════════
+const RESONATORS=[
+  {name:"Rover (Spectro)", el:"Spectro", role:"support", emoji:"🌟"},
+  {name:"Rover (Havoc)",   el:"Havoc",   role:"dps",     emoji:"💜"},
+  {name:"Jiyan",           el:"Aero",    role:"dps",     emoji:"🌪️"},
+  {name:"Calcharo",        el:"Electro", role:"dps",     emoji:"⚡"},
+  {name:"Encore",          el:"Fusion",  role:"dps",     emoji:"🔥"},
+  {name:"Jianxin",         el:"Aero",    role:"subdps",  emoji:"🌬️"},
+  {name:"Lingyang",        el:"Glacio",  role:"dps",     emoji:"❄️"},
+  {name:"Verina",          el:"Spectro", role:"support", emoji:"✨"},
+  {name:"Aalto",           el:"Aero",    role:"subdps",  emoji:"🍃"},
+  {name:"Baizhi",          el:"Glacio",  role:"support", emoji:"🌿"},
+  {name:"Chixia",          el:"Fusion",  role:"dps",     emoji:"🔫"},
+  {name:"Danjin",          el:"Havoc",   role:"subdps",  emoji:"🗡️"},
+  {name:"Mortefi",         el:"Fusion",  role:"subdps",  emoji:"🎯"},
+  {name:"Sanhua",          el:"Glacio",  role:"subdps",  emoji:"🌨️"},
+  {name:"Taoqi",           el:"Havoc",   role:"support", emoji:"🛡️"},
+  {name:"Yangyang",        el:"Aero",    role:"subdps",  emoji:"🎐"},
+  {name:"Yuanwu",          el:"Electro", role:"support", emoji:"🥊"},
+  {name:"Jinhsi",          el:"Spectro", role:"dps",     emoji:"💫"},
+  {name:"Changli",         el:"Fusion",  role:"subdps",  emoji:"🌋"},
+  {name:"Xiangli Yao",     el:"Electro", role:"dps",     emoji:"⚖️"},
+  {name:"Zhezhi",          el:"Glacio",  role:"subdps",  emoji:"🧊"},
+  {name:"Shorekeeper",     el:"Spectro", role:"support", emoji:"🌊"},
+  {name:"Youhu",           el:"Glacio",  role:"support", emoji:"🦊"},
+  {name:"Camellya",        el:"Havoc",   role:"dps",     emoji:"🌸"},
+  {name:"Lumi",            el:"Electro", role:"subdps",  emoji:"💡"},
+  {name:"Carlotta",        el:"Glacio",  role:"dps",     emoji:"🔮"},
+  {name:"Roccia",          el:"Havoc",   role:"subdps",  emoji:"🪨"},
+  {name:"Phoebe",          el:"Spectro", role:"subdps",  emoji:"🌙"},
+  {name:"Brant",           el:"Havoc",   role:"support", emoji:"💀"},
+  {name:"Cantarella",      el:"Havoc",   role:"support", emoji:"🎭"},
+  {name:"Rover (Aero)",    el:"Aero",    role:"support", emoji:"🌬️"},
+  {name:"Zani",            el:"Spectro", role:"dps",     emoji:"👊"},
+  {name:"Ciaccona",        el:"Aero",    role:"subdps",  emoji:"🎵"},
+  {name:"Cartethyia",      el:"Aero",    role:"dps",     emoji:"🌺"},
+  {name:"Lupa",            el:"Fusion",  role:"dps",     emoji:"🐺"},
+  {name:"Phrolova",        el:"Havoc",   role:"dps",     emoji:"🦅"},
+  {name:"Augusta",         el:"Electro", role:"dps",     emoji:"👑"},
+  {name:"Iuno",            el:"Aero",    role:"subdps",  emoji:"🎪"},
+  {name:"Galbrena",        el:"Fusion",  role:"dps",     emoji:"⚔️"},
+  {name:"Qiuyuan",         el:"Aero",    role:"subdps",  emoji:"🍂"},
+  {name:"Chisa",           el:"Havoc",   role:"support", emoji:"🌀"},
+  {name:"Buling",          el:"Electro", role:"support", emoji:"⚡"},
+  {name:"Lynae",           el:"Spectro", role:"subdps",  emoji:"🌿"},
+  {name:"Mornye",          el:"Fusion",  role:"support", emoji:"🌾"},
+  {name:"Aemeath",         el:"Fusion",  role:"dps",     emoji:"🔱"},
+  {name:"Luuk Herssen",    el:"Spectro", role:"dps",     emoji:"🗡️"},
+];
+
+// ══════════════════════════════════════
+// CARD POOLS PER CHARACTER
+// Cards: {n, t, ic, v, c, bv, ult}
+// t: attack | buff | defend | heal | debuff
+// Supports: NO attack cards
+// ══════════════════════════════════════
+const CHAR_CARDS={
+  "Rover (Spectro)":[
+    {n:"Soul Link",   t:"heal",   ic:"🌟",v:55,c:2},
+    {n:"Light Veil",  t:"defend", ic:"🛡️",v:50,c:2},
+    {n:"Resonance",   t:"buff",   ic:"✨",bv:.18,c:2},
+    {n:"Luminary",    t:"heal",   ic:"💫",v:80,c:3},
+    {n:"Starweave",   t:"defend", ic:"🌟",v:75,c:3,ult:true},
+  ],
+  "Rover (Havoc)":[
+    {n:"Void Slash",  t:"attack", ic:"💜",v:62,c:2},
+    {n:"Rend",        t:"attack", ic:"🌑",v:38,c:1},
+    {n:"Dark Wave",   t:"attack", ic:"🌀",v:90,c:3},
+    {n:"Havoc Buff",  t:"buff",   ic:"💢",bv:.2,c:2},
+    {n:"Cataclysm",   t:"attack", ic:"💥",v:125,c:3,ult:true},
+  ],
+  "Jiyan":[
+    {n:"Gale Cleave", t:"attack", ic:"🌪️",v:65,c:2},
+    {n:"Wind Rush",   t:"attack", ic:"💨",v:36,c:1},
+    {n:"Storm Break", t:"attack", ic:"🌊",v:92,c:3},
+    {n:"Tailwind",    t:"buff",   ic:"🎐",bv:.15,c:2},
+    {n:"Qingloong",   t:"attack", ic:"🐉",v:128,c:3,ult:true},
+  ],
+  "Calcharo":[
+    {n:"Wuthering",   t:"attack", ic:"⚡",v:60,c:2},
+    {n:"Resonator",   t:"attack", ic:"🌩️",v:38,c:1},
+    {n:"Deathblade",  t:"attack", ic:"💀",v:90,c:3},
+    {n:"Charge Up",   t:"buff",   ic:"🔋",bv:.2,c:2},
+    {n:"Soulrend",    t:"attack", ic:"⚡",v:122,c:3,ult:true},
+  ],
+  "Encore":[
+    {n:"Flaming Lamb",t:"attack", ic:"🔥",v:58,c:2},
+    {n:"Wooly Atk",   t:"attack", ic:"🐑",v:33,c:1},
+    {n:"Infernal",    t:"attack", ic:"🌋",v:88,c:3},
+    {n:"Burning Soul",t:"buff",   ic:"♨️",bv:.25,c:3},
+    {n:"Cosmos",      t:"attack", ic:"☄️",v:130,c:3,ult:true},
+  ],
+  "Jianxin":[
+    {n:"Taichi Fist",  t:"attack", ic:"🌬️",v:48,c:2},
+    {n:"Wind Jab",     t:"attack", ic:"💨",v:30,c:1},
+    {n:"Barrier",      t:"defend", ic:"🛡️",v:60,c:2},
+    {n:"Focus",        t:"buff",   ic:"🧘",bv:.12,c:1},
+    {n:"Abyssal",      t:"attack", ic:"🌀",v:120,c:3,ult:true},
+  ],
+  "Lingyang":[
+    {n:"Lion's Fist",  t:"attack", ic:"❄️",v:55,c:2},
+    {n:"Ice Dash",     t:"attack", ic:"🧊",v:36,c:1},
+    {n:"Blizzard Fist",t:"attack", ic:"🌨️",v:82,c:3},
+    {n:"Frost Guard",  t:"defend", ic:"🛡️",v:44,c:2},
+    {n:"Mythical",     t:"attack", ic:"🦁",v:126,c:3,ult:true},
+  ],
+  "Verina":[
+    {n:"Heal Bloom",   t:"heal",   ic:"🌿",v:60,c:2},
+    {n:"Petal Toss",   t:"defend", ic:"🌸",v:38,c:1},
+    {n:"Verdant Chain",t:"heal",   ic:"💚",v:88,c:3},
+    {n:"Nature Veil",  t:"buff",   ic:"🌱",bv:.15,c:2},
+    {n:"Arboretum",    t:"heal",   ic:"🌳",v:130,c:3,ult:true},
+  ],
+  "Aalto":[
+    {n:"Fog Blade",    t:"attack", ic:"🍃",v:50,c:2},
+    {n:"Mist Step",    t:"attack", ic:"💨",v:30,c:1},
+    {n:"Gust Barrage", t:"attack", ic:"🌪️",v:76,c:3},
+    {n:"Smokescreen",  t:"debuff", ic:"🌫️",v:22,c:2},
+    {n:"Mistwalker",   t:"attack", ic:"🌬️",v:120,c:3,ult:true},
+  ],
+  "Baizhi":[
+    {n:"Healing Wind", t:"heal",   ic:"🌿",v:55,c:2},
+    {n:"Herb Shield",  t:"defend", ic:"🌱",v:48,c:1},
+    {n:"Verdant Burst",t:"heal",   ic:"💚",v:82,c:3},
+    {n:"Barrier Bloom",t:"defend", ic:"🌳",v:55,c:2},
+    {n:"Eternal Bloom",t:"heal",   ic:"🌸",v:128,c:3,ult:true},
+  ],
+  "Chixia":[
+    {n:"Fire Shot",    t:"attack", ic:"🔫",v:56,c:2},
+    {n:"Quick Draw",   t:"attack", ic:"💥",v:34,c:1},
+    {n:"Inferno Shot", t:"attack", ic:"🔥",v:84,c:3},
+    {n:"Heat Up",      t:"buff",   ic:"♨️",bv:.18,c:2},
+    {n:"Blazing Rain", t:"attack", ic:"🌋",v:122,c:3,ult:true},
+  ],
+  "Danjin":[
+    {n:"Bloody Slash", t:"attack", ic:"🗡️",v:62,c:2},
+    {n:"Quick Slice",  t:"attack", ic:"⚔️",v:36,c:1},
+    {n:"Crimson Tide", t:"debuff", ic:"🩸",v:28,c:2},
+    {n:"Blood Pact",   t:"buff",   ic:"💢",bv:.22,c:2},
+    {n:"Vermillion",   t:"attack", ic:"🔱",v:124,c:3,ult:true},
+  ],
+  "Mortefi":[
+    {n:"Flame Arc",    t:"attack", ic:"🎯",v:54,c:2},
+    {n:"Ember",        t:"attack", ic:"🔥",v:32,c:1},
+    {n:"Ignition",     t:"debuff", ic:"☠️",v:24,c:2},
+    {n:"Overheat",     t:"buff",   ic:"♨️",bv:.2,c:2},
+    {n:"Conflagrate",  t:"attack", ic:"🌋",v:120,c:3,ult:true},
+  ],
+  "Sanhua":[
+    {n:"Ice Prison",   t:"attack", ic:"🌨️",v:54,c:2},
+    {n:"Cold Snap",    t:"attack", ic:"❄️",v:32,c:1},
+    {n:"Cryo Lock",    t:"debuff", ic:"🔒",v:20,c:2},
+    {n:"Glacial Guard",t:"defend", ic:"🛡️",v:50,c:2},
+    {n:"Eternal Frost",t:"attack", ic:"🧊",v:122,c:3,ult:true},
+  ],
+  "Taoqi":[
+    {n:"Block",        t:"defend", ic:"🛡️",v:68,c:2},
+    {n:"Shield Bash",  t:"attack", ic:"🛡️",v:40,c:1},
+    {n:"Great Wall",   t:"defend", ic:"🏯",v:90,c:3},
+    {n:"Taunt",        t:"buff",   ic:"📣",bv:.1,c:1},
+    {n:"Unbreakable",  t:"defend", ic:"⛰️",v:130,c:3,ult:true},
+  ],
+  "Yangyang":[
+    {n:"Wind Dance",   t:"attack", ic:"🎐",v:48,c:2},
+    {n:"Feather Slash",t:"attack", ic:"🪶",v:28,c:1},
+    {n:"Sky Rend",     t:"debuff", ic:"🌤️",v:22,c:2},
+    {n:"Gale Step",    t:"buff",   ic:"💨",bv:.15,c:2},
+    {n:"Stormwing",    t:"attack", ic:"🌪️",v:120,c:3,ult:true},
+  ],
+  "Yuanwu":[
+    {n:"Iron Body",    t:"defend", ic:"🛡️",v:58,c:2},
+    {n:"Static Jab",   t:"attack", ic:"⚡",v:35,c:1},
+    {n:"Thunder Guard",t:"defend", ic:"⚡",v:75,c:2},
+    {n:"Rally",        t:"buff",   ic:"📯",bv:.12,c:1},
+    {n:"Thunderclad",  t:"defend", ic:"⛈️",v:128,c:3,ult:true},
+  ],
+  "Jinhsi":[
+    {n:"Stellar Strike",t:"attack",ic:"💫",v:65,c:2},
+    {n:"Radiance",     t:"attack", ic:"🌟",v:38,c:1},
+    {n:"Blazing Sun",  t:"attack", ic:"☀️",v:96,c:3},
+    {n:"Illuminate",   t:"buff",   ic:"✨",bv:.2,c:2},
+    {n:"Incarnation",  t:"attack", ic:"🌞",v:130,c:3,ult:true},
+  ],
+  "Changli":[
+    {n:"Flame Burst",  t:"attack", ic:"🔥",v:58,c:2},
+    {n:"Ember Shot",   t:"attack", ic:"💥",v:34,c:1},
+    {n:"Inferno Wave", t:"debuff", ic:"☠️",v:26,c:2},
+    {n:"Burn Mark",    t:"buff",   ic:"♨️",bv:.18,c:2},
+    {n:"True Sight",   t:"attack", ic:"🌋",v:122,c:3,ult:true},
+  ],
+  "Xiangli Yao":[
+    {n:"Thunderclap",  t:"attack", ic:"⚡",v:60,c:2},
+    {n:"Chain Bolt",   t:"attack", ic:"🔗",v:36,c:1},
+    {n:"Judge Strike", t:"attack", ic:"⚖️",v:92,c:3},
+    {n:"Electro Field",t:"buff",   ic:"🌐",bv:.18,c:2},
+    {n:"Verdict",      t:"attack", ic:"⚖️",v:128,c:3,ult:true},
+  ],
+  "Zhezhi":[
+    {n:"Brushstroke",  t:"attack", ic:"🧊",v:54,c:2},
+    {n:"Ink Frost",    t:"attack", ic:"❄️",v:32,c:1},
+    {n:"Cryo Canvas",  t:"debuff", ic:"🖼️",v:22,c:2},
+    {n:"Ice Veil",     t:"defend", ic:"🛡️",v:50,c:2},
+    {n:"Masterpiece",  t:"attack", ic:"🎨",v:122,c:3,ult:true},
+  ],
+  "Shorekeeper":[
+    {n:"Tidal Wave",   t:"heal",   ic:"🌊",v:58,c:2},
+    {n:"Sea Pulse",    t:"defend", ic:"💧",v:50,c:2},
+    {n:"Abyss Call",   t:"buff",   ic:"🌑",bv:.15,c:2},
+    {n:"Barrier Reef", t:"defend", ic:"🛡️",v:72,c:3},
+    {n:"Revelation",   t:"heal",   ic:"🌊",v:128,c:3,ult:true},
+  ],
+  "Youhu":[
+    {n:"Ice Guard",    t:"defend", ic:"🦊",v:60,c:2},
+    {n:"Frost Aura",   t:"buff",   ic:"❄️",bv:.15,c:2},
+    {n:"Cryo Shield",  t:"defend", ic:"🛡️",v:78,c:3},
+    {n:"Tail Whip",    t:"heal",   ic:"💚",v:45,c:1},
+    {n:"Arctic Fox",   t:"defend", ic:"🌨️",v:128,c:3,ult:true},
+  ],
+  "Camellya":[
+    {n:"Petal Storm",  t:"attack", ic:"🌸",v:62,c:2},
+    {n:"Vine Lash",    t:"attack", ic:"🌿",v:36,c:1},
+    {n:"Bloom Burst",  t:"attack", ic:"💐",v:92,c:3},
+    {n:"Dark Bloom",   t:"debuff", ic:"☠️",v:22,c:2},
+    {n:"Elegy",        t:"attack", ic:"🌺",v:130,c:3,ult:true},
+  ],
+  "Lumi":[
+    {n:"Volt Shot",    t:"attack", ic:"💡",v:52,c:2},
+    {n:"Spark",        t:"attack", ic:"⚡",v:30,c:1},
+    {n:"Surge",        t:"debuff", ic:"🌩️",v:20,c:2},
+    {n:"Amp Up",       t:"buff",   ic:"🔋",bv:.16,c:2},
+    {n:"Overload",     t:"attack", ic:"💥",v:120,c:3,ult:true},
+  ],
+  "Carlotta":[
+    {n:"Ice Bullet",   t:"attack", ic:"🔮",v:58,c:2},
+    {n:"Frost Shot",   t:"attack", ic:"❄️",v:33,c:1},
+    {n:"Crystal Rain", t:"attack", ic:"💎",v:86,c:3},
+    {n:"Chill Aura",   t:"buff",   ic:"🌡️",bv:.18,c:2},
+    {n:"Blizzard",     t:"attack", ic:"🧊",v:128,c:3,ult:true},
+  ],
+  "Roccia":[
+    {n:"Rock Slam",    t:"attack", ic:"🪨",v:65,c:2},
+    {n:"Pebble Toss",  t:"attack", ic:"💜",v:36,c:1},
+    {n:"Gravity Crash",t:"debuff", ic:"🌑",v:26,c:2},
+    {n:"Stone Wall",   t:"defend", ic:"🛡️",v:58,c:3},
+    {n:"Avalanche",    t:"attack", ic:"🏔️",v:124,c:3,ult:true},
+  ],
+  "Phoebe":[
+    {n:"Moonray",      t:"attack", ic:"🌙",v:54,c:2},
+    {n:"Star Dust",    t:"attack", ic:"⭐",v:32,c:1},
+    {n:"Lunar Veil",   t:"debuff", ic:"🌑",v:22,c:2},
+    {n:"Moonveil",     t:"defend", ic:"🛡️",v:44,c:2},
+    {n:"Eclipse",      t:"attack", ic:"🌑",v:122,c:3,ult:true},
+  ],
+  "Brant":[
+    {n:"Dirge",        t:"heal",   ic:"💀",v:50,c:2},
+    {n:"Soul Guard",   t:"defend", ic:"🛡️",v:55,c:1},
+    {n:"Pale Veil",    t:"defend", ic:"🌫️",v:75,c:3},
+    {n:"Grim Pact",    t:"buff",   ic:"🔱",bv:.15,c:2},
+    {n:"Requiem",      t:"heal",   ic:"🎼",v:126,c:3,ult:true},
+  ],
+  "Cantarella":[
+    {n:"Waltz Shield", t:"defend", ic:"🎭",v:58,c:2},
+    {n:"Masked Step",  t:"heal",   ic:"🎪",v:40,c:1},
+    {n:"Veil",         t:"defend", ic:"🌫️",v:78,c:3},
+    {n:"Venom Pact",   t:"buff",   ic:"☠️",bv:.15,c:2},
+    {n:"Finale",       t:"heal",   ic:"🎇",v:128,c:3,ult:true},
+  ],
+  "Rover (Aero)":[
+    {n:"Wind Guard",   t:"defend", ic:"🌬️",v:55,c:2},
+    {n:"Aero Heal",    t:"heal",   ic:"💨",v:48,c:1},
+    {n:"Sky Barrier",  t:"defend", ic:"🛡️",v:76,c:3},
+    {n:"Gale Buff",    t:"buff",   ic:"🎐",bv:.15,c:2},
+    {n:"Tempest Veil", t:"defend", ic:"🌪️",v:128,c:3,ult:true},
+  ],
+  "Zani":[
+    {n:"Spectral Fist",t:"attack", ic:"👊",v:60,c:2},
+    {n:"Ghost Jab",    t:"attack", ic:"👻",v:34,c:1},
+    {n:"Phantom Rush", t:"attack", ic:"💫",v:86,c:3},
+    {n:"Spirit Guard", t:"buff",   ic:"✨",bv:.18,c:2},
+    {n:"Oblivion",     t:"attack", ic:"🌑",v:126,c:3,ult:true},
+  ],
+  "Ciaccona":[
+    {n:"Music Blade",  t:"attack", ic:"🎵",v:52,c:2},
+    {n:"Note Strike",  t:"attack", ic:"🎶",v:30,c:1},
+    {n:"Cadence",      t:"debuff", ic:"🎼",v:22,c:2},
+    {n:"Harmony",      t:"buff",   ic:"🎸",bv:.16,c:2},
+    {n:"Symphony",     t:"attack", ic:"🎺",v:120,c:3,ult:true},
+  ],
+  "Cartethyia":[
+    {n:"Petal Slash",  t:"attack", ic:"🌺",v:54,c:2},
+    {n:"Wind Kiss",    t:"attack", ic:"💨",v:30,c:1},
+    {n:"Blossom Storm",t:"attack", ic:"🌸",v:82,c:3},
+    {n:"Gentle Breeze",t:"buff",   ic:"🎐",bv:.15,c:2},
+    {n:"Flowering",    t:"attack", ic:"🌻",v:124,c:3,ult:true},
+  ],
+  "Lupa":[
+    {n:"Wolf Fang",    t:"attack", ic:"🐺",v:65,c:2},
+    {n:"Pack Howl",    t:"attack", ic:"🌙",v:38,c:1},
+    {n:"Alpha Strike", t:"attack", ic:"⚔️",v:92,c:3},
+    {n:"Fury",         t:"buff",   ic:"🔥",bv:.25,c:3},
+    {n:"Bloodlust",    t:"attack", ic:"🩸",v:130,c:3,ult:true},
+  ],
+  "Phrolova":[
+    {n:"Dark Talon",   t:"attack", ic:"🦅",v:62,c:2},
+    {n:"Dive",         t:"attack", ic:"💨",v:36,c:1},
+    {n:"Shred",        t:"debuff", ic:"☠️",v:24,c:2},
+    {n:"Predator",     t:"buff",   ic:"🔥",bv:.2,c:2},
+    {n:"Storm Dive",   t:"attack", ic:"🌑",v:128,c:3,ult:true},
+  ],
+  "Augusta":[
+    {n:"Crown Strike", t:"attack", ic:"👑",v:60,c:2},
+    {n:"Zap",          t:"attack", ic:"⚡",v:36,c:1},
+    {n:"Royal Arc",    t:"attack", ic:"🌩️",v:90,c:3},
+    {n:"Sovereign",    t:"buff",   ic:"🏆",bv:.22,c:2},
+    {n:"Dominion",     t:"attack", ic:"👑",v:128,c:3,ult:true},
+  ],
+  "Iuno":[
+    {n:"Aero Jab",     t:"attack", ic:"🎪",v:50,c:2},
+    {n:"Gust",         t:"attack", ic:"💨",v:28,c:1},
+    {n:"Wind Debuff",  t:"debuff", ic:"🌀",v:20,c:2},
+    {n:"Breeze Buff",  t:"buff",   ic:"🎐",bv:.14,c:2},
+    {n:"Cyclone",      t:"attack", ic:"🌪️",v:120,c:3,ult:true},
+  ],
+  "Galbrena":[
+    {n:"Flame Blade",  t:"attack", ic:"⚔️",v:62,c:2},
+    {n:"Fire Jab",     t:"attack", ic:"🔥",v:36,c:1},
+    {n:"Inferno Cut",  t:"attack", ic:"🌋",v:90,c:3},
+    {n:"War Cry",      t:"buff",   ic:"📯",bv:.22,c:2},
+    {n:"Reckoning",    t:"attack", ic:"⚡",v:128,c:3,ult:true},
+  ],
+  "Qiuyuan":[
+    {n:"Autumn Blade", t:"attack", ic:"🍂",v:50,c:2},
+    {n:"Leaf Dart",    t:"attack", ic:"🍃",v:28,c:1},
+    {n:"Wind Scar",    t:"debuff", ic:"🌬️",v:20,c:2},
+    {n:"Harvest",      t:"buff",   ic:"🌾",bv:.15,c:2},
+    {n:"Last Leaf",    t:"attack", ic:"🍁",v:120,c:3,ult:true},
+  ],
+  "Chisa":[
+    {n:"Vortex Guard", t:"defend", ic:"🌀",v:60,c:2},
+    {n:"Dark Heal",    t:"heal",   ic:"💜",v:48,c:1},
+    {n:"Abyss Shield", t:"defend", ic:"🛡️",v:80,c:3},
+    {n:"Shadow Buff",  t:"buff",   ic:"🌑",bv:.15,c:2},
+    {n:"Oblivion",     t:"defend", ic:"🌀",v:128,c:3,ult:true},
+  ],
+  "Buling":[
+    {n:"Static Guard", t:"defend", ic:"⚡",v:55,c:2},
+    {n:"Volt Heal",    t:"heal",   ic:"💚",v:45,c:1},
+    {n:"Surge Shield", t:"defend", ic:"🛡️",v:76,c:3},
+    {n:"Charge Buff",  t:"buff",   ic:"🔋",bv:.14,c:2},
+    {n:"Overcharge",   t:"heal",   ic:"💡",v:126,c:3,ult:true},
+  ],
+  "Lynae":[
+    {n:"Spectro Blade",t:"attack", ic:"🌿",v:52,c:2},
+    {n:"Vine Strike",  t:"attack", ic:"🍃",v:30,c:1},
+    {n:"Root Debuff",  t:"debuff", ic:"🌱",v:22,c:2},
+    {n:"Nature Buff",  t:"buff",   ic:"🌳",bv:.16,c:2},
+    {n:"Overgrowth",   t:"attack", ic:"🌲",v:120,c:3,ult:true},
+  ],
+  "Mornye":[
+    {n:"Harvest Heal", t:"heal",   ic:"🌾",v:58,c:2},
+    {n:"Crop Shield",  t:"defend", ic:"🛡️",v:50,c:1},
+    {n:"Abundance",    t:"heal",   ic:"💚",v:82,c:3},
+    {n:"Blessing",     t:"buff",   ic:"✨",bv:.15,c:2},
+    {n:"Bounty",       t:"heal",   ic:"🌟",v:128,c:3,ult:true},
+  ],
+  "Aemeath":[
+    {n:"Flame Cross",  t:"attack", ic:"🔱",v:62,c:2},
+    {n:"Sacred Fire",  t:"attack", ic:"🔥",v:36,c:1},
+    {n:"Holy Blaze",   t:"attack", ic:"✝️",v:92,c:3},
+    {n:"Devotion",     t:"buff",   ic:"✨",bv:.22,c:2},
+    {n:"Revelation",   t:"attack", ic:"🌟",v:128,c:3,ult:true},
+  ],
+  "Luuk Herssen":[
+    {n:"Spectro Blade",t:"attack", ic:"🗡️",v:62,c:2},
+    {n:"Quick Slash",  t:"attack", ic:"⚡",v:36,c:1},
+    {n:"Void Edge",    t:"attack", ic:"💫",v:90,c:3},
+    {n:"Battle Cry",   t:"buff",   ic:"📯",bv:.2,c:2},
+    {n:"Annihilation", t:"attack", ic:"💥",v:128,c:3,ult:true},
+  ],
+};
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let G={};
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function shuf(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function normRole(r){
+  const s=r.toLowerCase().trim();
+  if(s==='sub'||s==='subdps'||s==='sub-dps') return 'subdps';
+  if(s.startsWith('sup')||s==='supp') return 'support';
+  return 'dps';
+}
+
+function makeFighter(c){
+  const role=normRole(c.role||'dps');
+  const rs=ROLE_ST[role];
+  const maxHp=rnd(...rs.hp),atk=rnd(...rs.atk),def=rnd(...rs.def);
+  return{...c,role,maxHp,hp:maxHp,atk,def,
+    shield:0,atkMult:1,buffRounds:0,alive:true,
+    id:'f'+Math.random().toString(36).slice(2),
+    cardPool:CHAR_CARDS[c.name]||CHAR_CARDS["Jiyan"],
+    committed:[], // array of cards now!
+  };
+}
+
+function startBattle(){
+  const all=shuf([...RESONATORS]);
+  G={
+    player:all.slice(0,3).map(makeFighter),
+    enemy: all.slice(3,6).map(makeFighter),
+    energy:10,maxE:10,round:1,
+    phase:'commit',
+    hand:[],
+    done:false,
+  };
+  G.player.forEach(f=>drawForFighter(f,2));
+  showScreen('battleScreen');
+  renderAll();
+}
+
+function drawForFighter(f,n=1){
+  const pool=f.cardPool;
+  shuf([...pool]).slice(0,n).forEach(c=>
+    G.hand.push({...c,ownerId:f.id,ownerName:f.name,hid:'h'+Math.random().toString(36).slice(2)})
+  );
+}
+
+// ══════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════
+function elC(el){return `var(${EL_VAR[el]||'--Physical'})`;}
+function hpColor(pct){return pct>50?'var(--green)':pct>25?'var(--gold)':'var(--red)';}
+function typeCol(t){return t==='attack'?'#ff6060':t==='heal'?'#2ecc71':t==='defend'?'#60a0ff':t==='buff'?'var(--gold)':t==='debuff'?'#bb44ff':'var(--dim2)';}
+
+function renderFighter(f,isPlayer){
+  const pct=Math.max(0,f.hp/f.maxHp*100);
+  const boxCol=elC(f.el);
+
+  // slots: all committed + one empty drop slot
+  let slotsHtml='';
+  if(isPlayer){
+    slotsHtml='<div class="f-slots">';
+    f.committed.forEach((c,i)=>{
+      const tc=typeCol(c.t);
+      const isUlt=c.ult?'ultimate':'';
+      slotsHtml+=`<div class="cslot filled" id="slot-${f.id}-${i}">
+        <div class="placed ${isUlt}" onclick="unplace('${f.id}',${i})" title="Click to remove">
+          <div class="placed-ic">${c.ic}</div>
+          <div class="placed-tp" style="color:${tc}">${c.ult?'ULT':c.t.toUpperCase()}</div>
+        </div>
+      </div>`;
+    });
+    // always show one empty drop slot
+    slotsHtml+=`<div class="cslot add-slot" id="slot-${f.id}-new"
+      ondragover="event.preventDefault();this.classList.add('over')"
+      ondragleave="this.classList.remove('over')"
+      ondrop="dropSlot(event,'${f.id}')">+</div>`;
+    slotsHtml+='</div>';
+  } else {
+    // invisible placeholder for height matching
+    slotsHtml=`<div class="f-slots"><div class="cslot" style="visibility:hidden"></div></div>`;
+  }
+
+  // buff indicator
+  const buffHtml = f.buffRounds>0
+    ? `<div class="buff-row"><span class="buff-pip">⬆️ATK ×${f.atkMult.toFixed(2)} (${f.buffRounds}r)</span></div>`
+    : '';
+
+  return`<div class="fighter${isPlayer?'':' enemy-fighter'}${f.alive?'':' dead'}" id="f-${f.id}"
+    ${isPlayer?'':` onclick="showPeek('${f.id}',event)"`}>
+    <div class="f-avatar" style="background:${boxCol}20;border:2px solid ${boxCol}60">${f.emoji}</div>
+    <div class="f-body">
+      <div class="f-top">
+        <span class="f-name" style="color:${boxCol}">${f.name}</span>
+        ${isPlayer?`<span class="role-badge role-${f.role}">${f.role}</span>`:''}
+      </div>
+      <div class="f-stats-row"><span>ATK <b>${f.atk}</b></span><span>DEF <b>${f.def}</b></span></div>
+      <div class="hp-lbl" style="color:${hpColor(pct)}">${Math.max(0,f.hp)}/${f.maxHp}${f.shield>0?` 🛡️${f.shield}`:''}</div>
+      ${buffHtml}
+      ${slotsHtml}
+    </div>
+  </div>`;
+}
+
+function renderCard(hc){
+  const canUse=G.energy>=hc.c&&G.phase==='commit'&&!G.done;
+  const tc=typeCol(hc.t);
+  const val=hc.t==='attack'||hc.t==='debuff'?`⚔️${hc.v||''}`:hc.t==='heal'||hc.t==='defend'?`${hc.ic}${hc.v||''}`:hc.bv?`+${Math.round(hc.bv*100)}%`:'';
+  const isUlt=hc.ult;
+  return`<div class="card${canUse?'':' cdis'}${isUlt?' ultimate-card':''}" id="hc-${hc.hid}"
+    draggable="${canUse}"
+    ondragstart="dStart(event,'${hc.hid}')"
+    ondragend="dEnd(event)"
+    title="${hc.n}${isUlt?' [ULTIMATE]':''} · Cost ${hc.c}">
+    <div class="card-cost">${hc.c}</div>
+    <div class="card-ic">${hc.ic}</div>
+    <div class="card-nm">${hc.n}</div>
+    <div class="card-tp" style="color:${tc}">${isUlt?'⭐ULT':hc.t.toUpperCase()}</div>
+    <div class="card-vl" style="color:${tc}">${val}</div>
+    <div class="card-ow">${hc.ownerName.split(' ')[0]}</div>
+  </div>`;
+}
+
+function renderAll(){
+  document.getElementById('playerCol').innerHTML=G.player.map(f=>renderFighter(f,true)).join('');
+  document.getElementById('enemyCol').innerHTML=G.enemy.map(f=>renderFighter(f,false)).join('');
+  document.getElementById('handRow').innerHTML=G.hand.map(renderCard).join('');
+  document.getElementById('roundNum').textContent=G.round;
+  const orbs=document.getElementById('orbsEl');
+  orbs.innerHTML=Array(G.maxE).fill(0).map((_,i)=>`<div class="orb${i<G.energy?' on':''}"></div>`).join('');
+  document.getElementById('enVal').textContent=G.energy;
+  const committing=G.phase==='commit';
+  document.getElementById('commitBtn').disabled=!committing||G.done;
+  document.getElementById('phaseLbl').textContent=committing
+    ?'Drag cards to fighters → Commit ⚔️ (unlimited per fighter!)'
+    :'Resolving round...';
+}
+
+function updateFighterDOM(f){
+  const el=document.getElementById('f-'+f.id);if(!el)return;
+  const pct=Math.max(0,f.hp/f.maxHp*100);
+  const lbl=el.querySelector('.hp-lbl');
+  if(lbl){lbl.textContent=`${Math.max(0,f.hp)}/${f.maxHp}${f.shield>0?` 🛡️${f.shield}`:''}`;lbl.style.color=hpColor(pct);}
+  if(!f.alive) el.classList.add('dead');
+  // update buff row
+  const buffRow=el.querySelector('.buff-row');
+  if(buffRow){
+    buffRow.innerHTML=f.buffRounds>0
+      ?`<span class="buff-pip">⬆️ATK ×${f.atkMult.toFixed(2)} (${f.buffRounds}r)</span>`
+      :'';
+  }
+}
+
+// ══════════════════════════════════════
+// DRAG & DROP
+// ══════════════════════════════════════
+let dragId=null;
+function dStart(e,hid){dragId=hid;setTimeout(()=>{const el=document.getElementById('hc-'+hid);if(el)el.classList.add('dragging');},0);e.dataTransfer.setData('text/plain',hid);}
+function dEnd(e){if(dragId){const el=document.getElementById('hc-'+dragId);if(el)el.classList.remove('dragging');}dragId=null;document.querySelectorAll('.cslot').forEach(s=>s.classList.remove('over'));}
+function dropSlot(e,fid){e.preventDefault();const hid=e.dataTransfer.getData('text/plain')||dragId;if(hid)placeCard(hid,fid);document.querySelectorAll('.cslot').forEach(s=>s.classList.remove('over'));}
+
+function placeCard(hid,fid){
+  const hc=G.hand.find(c=>c.hid===hid);
+  const f=G.player.find(x=>x.id===fid);
+  if(!hc||!f||!f.alive) return;
+  if(hc.ownerName!==f.name){
+    const slot=document.getElementById('slot-'+fid+'-new');
+    if(slot){slot.style.borderColor='var(--red)';setTimeout(()=>slot.style.borderColor='',600);}
+    return;
+  }
+  if(G.energy<hc.c) return;
+  G.energy-=hc.c;
+  f.committed.push({...hc});
+  G.hand=G.hand.filter(c=>c.hid!==hid);
+  renderAll();
+}
+
+function unplace(fid,idx){
+  if(G.phase!=='commit'||G.done) return;
+  const f=G.player.find(x=>x.id===fid);
+  if(!f) return;
+  const card=f.committed[idx];
+  if(!card) return;
+  G.energy+=card.c;
+  G.hand.push({...card,hid:'h'+Math.random().toString(36).slice(2)});
+  f.committed.splice(idx,1);
+  renderAll();
+}
+
+// Touch support
+let tCard=null,tClone=null;
+document.addEventListener('touchstart',e=>{
+  const el=e.target.closest('.card:not(.cdis)');
+  if(!el||G.phase!=='commit') return;
+  tCard=el.id.replace('hc-','');
+  tClone=el.cloneNode(true);
+  Object.assign(tClone.style,{position:'fixed',opacity:'.7',pointerEvents:'none',zIndex:'999',width:'54px',transition:'none'});
+  document.body.appendChild(tClone);
+},{passive:true});
+document.addEventListener('touchmove',e=>{
+  if(!tCard||!tClone) return;
+  const t=e.touches[0];
+  tClone.style.left=(t.clientX-27)+'px';tClone.style.top=(t.clientY-36)+'px';
+  document.querySelectorAll('.cslot').forEach(s=>{
+    const r=s.getBoundingClientRect();
+    s.classList.toggle('over',t.clientX>=r.left&&t.clientX<=r.right&&t.clientY>=r.top&&t.clientY<=r.bottom);
+  });
+},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(!tCard) return;
+  if(tClone){tClone.remove();tClone=null;}
+  const t=e.changedTouches[0];
+  const tgt=document.elementFromPoint(t.clientX,t.clientY);
+  const slot=tgt&&tgt.closest('.cslot');
+  if(slot){
+    const raw=slot.id.replace('slot-','').replace('-new','');
+    const fid=raw.split('-').slice(0,-1).join('-')||raw;
+    placeCard(tCard,fid);
+  }
+  document.querySelectorAll('.cslot').forEach(s=>s.classList.remove('over'));
+  tCard=null;
+},{passive:true});
+
+// ══════════════════════════════════════
+// COMBO DETECTION
+// ══════════════════════════════════════
+function detectCombos(playerActs, botActs){
+  const combos={};// fighterId -> bonus multiplier extra
+  const allActs=[...playerActs,...botActs];
+
+  playerActs.forEach(act=>{
+    const f=act.fighter;
+    const cards=f.committed;
+    const hasAtk=cards.some(c=>c.t==='attack'||c.t==='debuff');
+    const hasBuff=cards.some(c=>c.t==='buff');
+    const hasHeal=cards.some(c=>c.t==='heal');
+
+    // Buff + Attack same fighter same round → +20%
+    if(hasAtk&&hasBuff){
+      combos[f.id]=(combos[f.id]||1)+0.20;
+      showCombo('⚡ Combo! Buff+Attack +20%');
+    }
+  });
+
+  // Support heals this round AND DPS on same team attacks → DPS gets +10%
+  const playerSupports=playerActs.filter(a=>a.fighter.role==='support');
+  const playerDPS=playerActs.filter(a=>a.fighter.role==='dps');
+  const supportHealed=playerSupports.some(a=>a.fighter.committed.some(c=>c.t==='heal'));
+  if(supportHealed&&playerDPS.length){
+    playerDPS.forEach(a=>{combos[a.fighter.id]=(combos[a.fighter.id]||1)+0.10;});
+    showCombo('💚 Team Synergy! Support+DPS +10%');
+  }
+
+  // SubDPS debuff → DPS attack on same target → +25%
+  const subDebuff=playerActs.filter(a=>a.fighter.role==='subdps'&&a.fighter.committed.some(c=>c.t==='debuff'));
+  if(subDebuff.length&&playerDPS.length){
+    playerDPS.forEach(a=>{combos[a.fighter.id]=(combos[a.fighter.id]||1)+0.25;});
+    showCombo('🌀 Chain Combo! SubDPS→DPS +25%');
+  }
+
+  // Elemental Resonance: 2+ cards of same element across team → +15% all team damage
+  const elCounts={};
+  playerActs.forEach(a=>{a.fighter.committed.forEach(c=>{elCounts[a.fighter.el]=(elCounts[a.fighter.el]||0)+1;});});
+  const resonance=Object.values(elCounts).some(v=>v>=2);
+  if(resonance){
+    playerActs.forEach(a=>{combos[a.fighter.id]=(combos[a.fighter.id]||1)+0.15;});
+    showCombo('🌟 Elemental Resonance! +15% Team DMG');
+  }
+
+  return combos;
+}
+
+let comboTimeout=null;
+function showCombo(text){
+  if(comboTimeout) clearTimeout(comboTimeout);
+  const old=document.querySelector('.combo-flash');
+  if(old) old.remove();
+  const d=document.createElement('div');
+  d.className='combo-flash';d.textContent=text;
+  document.body.appendChild(d);
+  comboTimeout=setTimeout(()=>d.remove(),900);
+}
+
+// ══════════════════════════════════════
+// COMMIT & RESOLVE
+// ══════════════════════════════════════
+function commitRound(){
+  if(G.phase!=='commit'||G.done) return;
+  const committed=G.player.filter(f=>f.alive&&f.committed.length>0);
+  if(!committed.length){
+    // flash phase label
+    const lbl=document.getElementById('phaseLbl');
+    lbl.style.color='var(--red)';setTimeout(()=>lbl.style.color='',800);
+    return;
+  }
+  G.phase='resolve';
+  renderAll();
+
+  const playerActs=G.player.filter(f=>f.alive&&f.committed.length>0).map(f=>({fighter:f,side:'player'}));
+  const botActs=buildBotActs();
+  const combos=detectCombos(playerActs,botActs);
+
+  // Sort by DEF descending
+  const allActs=[...playerActs,...botActs].sort((a,b)=>b.fighter.def-a.fighter.def);
+
+  let delay=300;
+  allActs.forEach(act=>{
+    setTimeout(()=>{
+      if(!G.done) executeAct(act,combos);
+    },delay);
+    delay+=act.fighter.committed.length*700+400;
+  });
+  setTimeout(()=>{if(!G.done) newRound();},delay+400);
+}
+
+function buildBotActs(){
+  return G.enemy.filter(f=>f.alive).map(f=>{
+    const pool=f.cardPool;
+    const alivePl=G.player.filter(r=>r.alive);
+    let cards=[];
+    let budget=rnd(6,7); // Bot energy capped 6-7
+
+    // Build bot hand (random selection)
+    const botHand=shuf([...pool]);
+    for(const c of botHand){
+      if(budget<c.c) continue;
+      // Support: defend/heal if low hp, else buff
+      if(f.role==='support'){
+        if(f.hp<f.maxHp*0.5&&(c.t==='defend'||c.t==='heal')){cards.push(c);budget-=c.c;}
+        else if(c.t==='buff'||c.t==='heal'||c.t==='defend'){cards.push(c);budget-=c.c;}
+      } else {
+        // DPS/SubDPS: prefer attack, debuff, buff combo
+        if(c.t==='attack'||c.t==='debuff'){cards.push(c);budget-=c.c;}
+        else if(c.t==='buff'&&!cards.some(x=>x.t==='buff')){cards.push(c);budget-=c.c;}
+      }
+      if(budget<=0||cards.length>=3) break;
+    }
+    if(!cards.length) cards=[pick(pool)];
+    f.committed=cards;
+    return{fighter:f,side:'enemy'};
+  });
+}
+
+// ══════════════════════════════════════
+// EXECUTE ACTIONS
+// ══════════════════════════════════════
+function executeAct(act,combos={}){
+  const{fighter:f,side}=act;
+  const isPlayer=side==='player';
+  const allies=isPlayer?G.player:G.enemy;
+  const foes=isPlayer?G.enemy:G.player;
+  const owner=allies.find(x=>x.id===f.id);
+  if(!owner||!owner.alive) return;
+
+  const comboMult=combos[owner.id]||1;
+  const cards=[...owner.committed];
+
+  // Process buff first (so it applies before attacks in same round)
+  const buffCards=cards.filter(c=>c.t==='buff');
+  const atkCards=cards.filter(c=>c.t!=='buff');
+
+  [...buffCards,...atkCards].forEach((card,ci)=>{
+    setTimeout(()=>{
+      if(!owner.alive) return;
+      animF(owner.id,'attacking-anim');
+      const aliveFoes=foes.filter(r=>r.alive);
+      const aliveAllies=allies.filter(r=>r.alive);
+
+      if(card.t==='attack'||card.t==='debuff'){
+        if(!aliveFoes.length) return;
+        // Role-based targeting
+        let target;
+        if(owner.role==='subdps'&&card.t==='debuff'){
+          target=aliveFoes.sort((a,b)=>b.atk-a.atk)[0]; // highest ATK
+        } else {
+          target=aliveFoes.sort((a,b)=>a.hp-b.hp)[0]; // lowest HP
+        }
+        const raw=Math.round(card.v*owner.atkMult*(owner.atk/70)*comboMult);
+        const res=dealDmg(target,raw,owner.el);
+        fireProj(owner.id,target.id,owner.el,()=>{
+          animF(target.id,'taking-hit');
+          const cls=card.ult?'ult':res.isCrit?'crit':res.resist?'resist':'dmg';
+          floatDmg(target.id,`-${res.dmg}`,cls);
+          updateFighterDOM(target);
+          checkWin();
+        });
+      } else if(card.t==='defend'){
+        const sh=Math.round(card.v*(1+owner.def/80));
+        owner.shield+=sh;
+        animF(owner.id,'healing-anim');
+        floatDmg(owner.id,`+${sh}🛡️`,'buff');
+        updateFighterDOM(owner);
+      } else if(card.t==='heal'){
+        // Support buff split: 70% to lowest HP ally, 30% to self
+        const healAmt=Math.round(card.v*(1+owner.def/100));
+        const lowestAlly=aliveAllies.filter(a=>a.id!==owner.id).sort((a,b)=>(a.hp/a.maxHp)-(b.hp/b.maxHp))[0];
+        const mainHeal=Math.round(healAmt*0.7);
+        const selfHeal=Math.round(healAmt*0.3);
+        if(lowestAlly){
+          lowestAlly.hp=Math.min(lowestAlly.maxHp,lowestAlly.hp+mainHeal);
+          animF(lowestAlly.id,'healing-anim');
+          floatDmg(lowestAlly.id,`+${mainHeal}💚`,'heal');
+          updateFighterDOM(lowestAlly);
+        }
+        owner.hp=Math.min(owner.maxHp,owner.hp+selfHeal);
+        animF(owner.id,'healing-anim');
+        floatDmg(owner.id,`+${selfHeal}💚`,'heal');
+        updateFighterDOM(owner);
+      } else if(card.t==='buff'){
+        owner.atkMult=Math.min(2.5,(owner.atkMult||1)+(card.bv||.15));
+        owner.buffRounds=1; // lasts 1 round
+        // 70% buff goes to highest ATK ally if support
+        if(owner.role==='support'){
+          const topDPS=aliveAllies.filter(a=>a.id!==owner.id&&a.role==='dps').sort((a,b)=>b.atk-a.atk)[0];
+          if(topDPS){
+            topDPS.atkMult=Math.min(2.5,(topDPS.atkMult||1)+(card.bv||.15)*0.7);
+            topDPS.buffRounds=1;
+            animF(topDPS.id,'healing-anim');
+            floatDmg(topDPS.id,`+${Math.round((card.bv||.15)*70)}%ATK`,'buff');
+            updateFighterDOM(topDPS);
+          }
+          floatDmg(owner.id,`+${Math.round((card.bv||.15)*30)}%ATK`,'buff');
+        } else {
+          floatDmg(owner.id,`+${Math.round((card.bv||.15)*100)}%ATK`,'buff');
+        }
+        animF(owner.id,'healing-anim');
+        updateFighterDOM(owner);
+      }
+    }, ci*350);
+  });
+}
+
+function dealDmg(target,raw,atkEl){
+  // Same element = resist (-10%)
+  const resist=(atkEl===target.el);
+  const resMult=resist?RESISTANCE:1.0;
+  // Crit: 1.5% chance → +30%
+  const isCrit=Math.random()<0.015;
+  // DEF reduction
+  const defReduction=target.def*0.3;
+  let dmg=Math.max(1,Math.round(raw*resMult*(isCrit?1.3:1)-defReduction));
+  let absorbed=0;
+  if(target.shield>0){absorbed=Math.min(target.shield,dmg);target.shield-=absorbed;dmg-=absorbed;}
+  target.hp=Math.max(0,target.hp-dmg);
+  if(target.hp<=0) target.alive=false;
+  return{dmg,isCrit,resist,absorbed};
+}
+
+// ══════════════════════════════════════
+// NEW ROUND
+// ══════════════════════════════════════
+function newRound(){
+  if(G.done) return;
+  // Expire buffs and clear committed
+  [...G.player,...G.enemy].forEach(f=>{
+    f.committed=[];
+    if(f.buffRounds>0){
+      f.buffRounds--;
+      if(f.buffRounds===0) f.atkMult=1;
+    }
+  });
+  G.round++;
+  G.energy=G.maxE;
+  G.phase='commit';
+  G.player.filter(f=>f.alive).forEach(f=>drawForFighter(f,1));
+  renderAll();
+  checkWin();
+}
+
+// ══════════════════════════════════════
+// PROJECTILE
+// ══════════════════════════════════════
+function projHTML(el){
+  const shapes={
+    Spectro:`<svg width="26" height="26" viewBox="0 0 44 44"><polygon points="22,3 27,16 41,16 30,25 34,39 22,30 10,39 14,25 3,16 17,16" fill="var(--Spectro)"/></svg>`,
+    Aero:`<svg width="32" height="22" viewBox="0 0 44 28"><polygon points="0,4 18,0 14,9" fill="var(--Aero)" opacity=".9"/><polygon points="5,12 23,8 19,17" fill="var(--Aero)" opacity=".7"/><polygon points="10,20 28,16 24,25" fill="var(--Aero)" opacity=".5"/></svg>`,
+    Havoc:`<svg width="26" height="26" viewBox="0 0 44 44"><path d="M22 3 L39 22 L31 24 L37 41 L22 27 L7 41 L13 24 L5 22 Z" fill="var(--Havoc)"/></svg>`,
+    Glacio:`<svg width="22" height="30" viewBox="0 0 22 30"><polygon points="11,0 22,8 18,22 11,30 4,22 0,8" fill="var(--Glacio)"/></svg>`,
+    Electro:`<svg width="18" height="30" viewBox="0 0 44 44"><polygon points="28,2 15,22 22,22 13,42 31,20 24,20" fill="var(--Electro)"/></svg>`,
+    Fusion:`<svg width="22" height="30" viewBox="0 0 44 44"><ellipse cx="22" cy="35" rx="15" ry="7" fill="var(--Fusion)" opacity=".9"/><ellipse cx="22" cy="20" rx="10" ry="14" fill="var(--Fusion)" opacity=".8"/><ellipse cx="22" cy="8" rx="5" ry="8" fill="#fff" opacity=".5"/></svg>`,
+    Physical:`<div style="font-size:1.3rem">💥</div>`,
+  };
+  return shapes[el]||shapes.Physical;
+}
+function fireProj(fromId,toId,el,onHit){
+  const fe=document.getElementById('f-'+fromId),te=document.getElementById('f-'+toId);
+  if(!fe||!te){onHit();return;}
+  const fr=fe.getBoundingClientRect(),tr=te.getBoundingClientRect();
+  const proj=document.createElement('div');
+  proj.className='proj';proj.innerHTML=projHTML(el);
+  proj.style.cssText=`left:${fr.left+fr.width/2}px;top:${fr.top+fr.height/2}px;transform:translate(-50%,-50%)`;
+  document.getElementById('projLayer').appendChild(proj);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    proj.style.left=(tr.left+tr.width/2)+'px';proj.style.top=(tr.top+tr.height/2)+'px';
+    proj.style.transform='translate(-50%,-50%) scale(1.3)';
+  }));
+  setTimeout(()=>{proj.style.opacity='0';proj.style.transform='translate(-50%,-50%) scale(2)';setTimeout(()=>proj.remove(),180);onHit();},370);
+}
+function floatDmg(fid,val,cls){
+  const el=document.getElementById('f-'+fid);if(!el)return;
+  const d=document.createElement('div');d.className=`dmg-float ${cls}`;d.textContent=val;
+  el.style.position='relative';el.appendChild(d);setTimeout(()=>d.remove(),860);
+}
+function animF(fid,cls){
+  const el=document.getElementById('f-'+fid);if(!el)return;
+  el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),500);
+}
+
+// ══════════════════════════════════════
+// PEEK
+// ══════════════════════════════════════
+function showPeek(fid,e){
+  e.stopPropagation();
+  const f=G.enemy.find(x=>x.id===fid);if(!f)return;
+  const peek=document.getElementById('peekEl');
+  document.getElementById('peekTitle').textContent=`${f.emoji} ${f.name}'s Cards`;
+  document.getElementById('peekCards').innerHTML=f.cardPool.map(c=>{
+    const tc=typeCol(c.t);
+    const val=c.t==='attack'||c.t==='debuff'?`⚔️${c.v}`:c.t==='heal'||c.t==='defend'?`${c.ic}${c.v}`:c.bv?`+${Math.round(c.bv*100)}%`:'';
+    return`<div class="card" style="cursor:default${c.ult?';border-color:rgba(212,168,67,.5)':''}">
+      <div class="card-cost">${c.c}</div>
+      <div class="card-ic">${c.ic}</div>
+      <div class="card-nm">${c.n}</div>
+      <div class="card-tp" style="color:${tc}">${c.ult?'⭐ULT':c.t.toUpperCase()}</div>
+      <div class="card-vl" style="color:${tc}">${val}</div>
+    </div>`;
+  }).join('');
+  const x=Math.min(e.clientX+4,window.innerWidth-240),y=Math.min(e.clientY+4,window.innerHeight-220);
+  peek.style.left=x+'px';peek.style.top=y+'px';peek.style.display='block';
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#peekEl')&&!e.target.closest('.enemy-fighter'))
+    document.getElementById('peekEl').style.display='none';
+});
+
+// ══════════════════════════════════════
+// WIN / RESULT
+// ══════════════════════════════════════
+function checkWin(){
+  if(G.done) return;
+  const pa=G.player.filter(f=>f.alive).length;
+  const ea=G.enemy.filter(f=>f.alive).length;
+  if(!ea){G.done=true;setTimeout(()=>showResult(true),600);}
+  else if(!pa){G.done=true;setTimeout(()=>showResult(false),600);}
+}
+function showResult(won){
+  document.getElementById('resIcon').textContent=won?'🏆':'💀';
+  document.getElementById('resTitle').textContent=won?'Victory!':'Defeated...';
+  document.getElementById('resTitle').className='res-title '+(won?'win':'lose');
+  document.getElementById('resSub').textContent=won
+    ?`All enemies defeated in ${G.round} rounds!`
+    :`Your team fell on round ${G.round}.`;
+  document.getElementById('resultOv').classList.add('show');
+}
+function goTitle(){document.getElementById('resultOv').classList.remove('show');document.getElementById('peekEl').style.display='none';showScreen('titleScreen');}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+</script>
+</body>
+</html>
