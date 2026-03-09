@@ -344,9 +344,84 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
 .card-fly-nm{font-size:.3rem;font-weight:700;text-align:center;color:var(--text);}
 .card-fly-tp{font-size:.26rem;text-transform:uppercase;font-weight:700;}
 
-/* ── Fan card drag reorder ── */
-.fan-card.drag-over{border-color:var(--gold2)!important;box-shadow:0 0 10px rgba(212,168,67,.6)!important;}
-.fan-card.dragging{opacity:.35;}
+/* ── Mode select ── */
+.mode-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+.pvp-btn{background:linear-gradient(135deg,#1a0a3a,#6a30c8)!important;box-shadow:0 4px 24px rgba(106,48,200,.3)!important;}
+.pvp-btn:hover{box-shadow:0 8px 32px rgba(106,48,200,.5)!important;}
+
+/* ── PvP pass-device overlay ── */
+.pvp-overlay{display:none;position:fixed;inset:0;z-index:850;
+  background:rgba(0,0,0,.97);backdrop-filter:blur(16px);
+  align-items:center;justify-content:center;flex-direction:column;gap:18px;}
+.pvp-overlay.show{display:flex;}
+.pvp-ov-icon{font-size:3rem;}
+.pvp-ov-title{font-family:'Cinzel',serif;font-size:1.5rem;font-weight:900;color:var(--gold);text-align:center;}
+.pvp-ov-sub{font-size:.8rem;color:var(--dim2);text-align:center;max-width:280px;line-height:1.6;}
+.pvp-ov-team{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:4px 0;}
+.pvp-ov-fighter{display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;}
+.pvp-ov-emoji{font-size:1.6rem;}
+.pvp-ov-name{font-size:.5rem;font-weight:700;color:var(--text);}
+.pvp-ov-role{font-size:.38rem;color:var(--dim2);}
+.pvp-ready-btn{padding:12px 36px;background:linear-gradient(135deg,#1a0a3a,#6a30c8);
+  border:none;border-radius:10px;color:#fff;font-family:'Cinzel',serif;
+  font-size:.9rem;font-weight:700;letter-spacing:.08em;cursor:pointer;
+  transition:all .2s;box-shadow:0 4px 20px rgba(106,48,200,.3);margin-top:6px;}
+.pvp-ready-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(106,48,200,.5);}
+.pvp-tag{font-size:.44rem;padding:3px 10px;border-radius:20px;
+  background:rgba(106,48,200,.15);border:1px solid rgba(106,48,200,.4);color:#a070e8;}
+
+/* PvP turn badge in top bar */
+.pvp-turn-badge{display:none;font-family:'Cinzel',serif;font-size:.58rem;font-weight:700;
+  padding:3px 10px;border-radius:6px;letter-spacing:.06em;}
+.pvp-turn-badge.show{display:block;}
+.pvp-turn-badge.p1{background:rgba(74,158,255,.15);border:1px solid rgba(74,158,255,.4);color:var(--blue);}
+.pvp-turn-badge.p2{background:rgba(106,48,200,.15);border:1px solid rgba(106,48,200,.4);color:#a070e8;}
+
+/* Mode select overlay (shown after clicking Start Battle on title screen) */
+.mode-select-ov{position:fixed;inset:0;background:rgba(7,8,15,.94);backdrop-filter:blur(12px);
+  z-index:900;display:none;align-items:center;justify-content:center;}
+.mode-select-ov.show{display:flex;}
+.mode-select-box{background:var(--surface);border:1px solid rgba(212,168,67,.2);border-radius:18px;
+  padding:30px 36px;display:flex;flex-direction:column;align-items:center;gap:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.85);min-width:270px;max-width:340px;text-align:center;}
+.mode-select-title{font-family:'Cinzel',serif;font-size:1rem;font-weight:700;
+  color:var(--gold);letter-spacing:.12em;text-transform:uppercase;}
+.mode-select-sub{font-size:.6rem;color:var(--dim2);line-height:1.7;margin-top:-6px;}
+.mode-select-choices{display:flex;flex-direction:column;gap:10px;width:100%;}
+.mode-btn{padding:14px 20px;border:1px solid rgba(255,255,255,.1);border-radius:11px;
+  background:var(--surface2);color:var(--text);font-family:'Cinzel',serif;
+  font-size:.78rem;font-weight:600;letter-spacing:.05em;cursor:pointer;
+  transition:all .2s;display:flex;align-items:center;gap:12px;text-align:left;}
+.mode-btn:hover{background:var(--surface3);border-color:rgba(212,168,67,.35);
+  transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.4);}
+.mode-btn.pvp-choice{border-color:rgba(106,48,200,.25);}
+.mode-btn.pvp-choice:hover{border-color:rgba(106,48,200,.55);box-shadow:0 4px 18px rgba(106,48,200,.2);}
+.mode-btn-icon{font-size:1.5rem;flex-shrink:0;}
+.mode-btn-text{display:flex;flex-direction:column;gap:2px;}
+.mode-btn-lbl{font-size:.78rem;}
+.mode-btn-desc{font-size:.44rem;color:var(--dim2);font-family:'Exo 2',sans-serif;font-weight:400;letter-spacing:0;}
+
+/* Pass-device overlay */
+.pass-ov{position:fixed;inset:0;background:rgba(7,8,15,.97);backdrop-filter:blur(16px);
+  z-index:850;display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;padding:30px;}
+.pass-ov.show{display:flex;}
+.pass-ov-icon{font-size:3rem;line-height:1;}
+.pass-ov-title{font-family:'Cinzel',serif;font-size:1.2rem;font-weight:700;
+  color:#a070e8;letter-spacing:.08em;text-align:center;}
+.pass-ov-msg{font-size:.68rem;color:var(--dim2);text-align:center;line-height:1.7;max-width:280px;}
+.pass-ov-warn{font-size:.54rem;color:var(--gold);border:1px solid rgba(212,168,67,.3);
+  border-radius:8px;padding:6px 14px;background:rgba(212,168,67,.06);text-align:center;}
+.pass-ov-btn{padding:13px 36px;background:linear-gradient(135deg,#2a0a5a,#6a30c8);
+  border:none;border-radius:11px;color:#fff;font-family:'Cinzel',serif;
+  font-size:.88rem;font-weight:700;letter-spacing:.08em;cursor:pointer;
+  transition:all .2s;box-shadow:0 4px 20px rgba(106,48,200,.3);margin-top:4px;}
+.pass-ov-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(106,48,200,.5);}
+
+/* P2 active hand zone tint */
+.hand-zone-3col.p2-active .hand-col-lbl{color:#a070e8 !important;}
+.hand-zone-3col.p2-active{border-top:1px solid rgba(106,48,200,.3);}
 </style>
 </head>
 <body>
@@ -361,8 +436,34 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
     <span class="title-tag">Overdrive at 10 Energy</span>
     <span class="title-tag">Combo Synergy</span>
   </div>
-  <button class="start-btn" onclick="startBattle()">⚡ Start Battle</button>
+  <div class="mode-btns">
+    <button class="start-btn" onclick="showModeSelect()">⚔️ Start Battle</button>
+  </div>
   <div style="font-size:.6rem;color:var(--dim);margin-top:-6px;">Teams randomly assigned · enforced role composition</div>
+</div>
+
+<!-- Mode select overlay -->
+<div class="mode-select-ov" id="modeSelectOv">
+  <div class="mode-select-box">
+    <div class="mode-select-title">Select Mode</div>
+    <div class="mode-select-sub">Choose how you want to play this battle</div>
+    <div class="mode-select-choices">
+      <button class="mode-btn" onclick="startBattle('bot')">
+        <span class="mode-btn-icon">🤖</span>
+        <span class="mode-btn-text">
+          <span class="mode-btn-lbl">vs Bot</span>
+          <span class="mode-btn-desc">Solo — fight against AI · classic mode</span>
+        </span>
+      </button>
+      <button class="mode-btn pvp-choice" onclick="startBattle('pvp')">
+        <span class="mode-btn-icon">⚔️</span>
+        <span class="mode-btn-text">
+          <span class="mode-btn-lbl">vs Player</span>
+          <span class="mode-btn-desc">Local PvP — pass device · blind commits</span>
+        </span>
+      </button>
+    </div>
+  </div>
 </div>
 <div class="screen" id="battleScreen">
   <div class="top-bar">
@@ -376,6 +477,7 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
       <div id="overdriveBar" style="display:none" class="overdrive-banner">⚡ OVERDRIVE</div>
       <div id="guardBar" style="display:none" class="guard-banner">🛡️ Guard</div>
       <div class="phase-lbl" id="phaseLbl">Tap cards to commit</div>
+      <div class="pvp-turn-badge" id="pvpTurnBadge"></div>
     </div>
     <div class="top-bar-right">
       <button class="pass-btn" id="passBtn" onclick="passRound()">⏭ Pass</button>
@@ -394,11 +496,11 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
   </div>
   <div class="arena">
     <div class="fighters-row">
-      <div class="team-label">YOU</div>
+      <div class="team-label" id="playerTeamLbl">YOU</div>
       <div class="team-fighters" id="playerCol"></div>
       <div class="teams-divider"></div>
       <div class="team-fighters" id="enemyCol"></div>
-      <div class="team-label" style="color:var(--red)">FOE</div>
+      <div class="team-label" id="enemyTeamLbl" style="color:var(--red)">FOE</div>
     </div>
     <div class="hand-zone-3col" id="handZone">
       <div class="hand-col" id="handDps">
@@ -428,6 +530,15 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
 <div class="peek" id="peekEl" style="display:none">
   <div class="peek-title" id="peekTitle"></div>
   <div class="peek-cards" id="peekCards"></div>
+</div>
+
+<!-- Pass device overlay for PvP -->
+<div class="pass-ov" id="passOv">
+  <div class="pass-ov-icon">📱</div>
+  <div class="pass-ov-title" id="passOvTitle">Pass to Player 2</div>
+  <div class="pass-ov-msg" id="passOvMsg">Player 1 has locked in their cards.<br>Hand the device to Player 2!</div>
+  <div class="pass-ov-warn">⚠️ Player 1's cards are hidden. Don't peek!</div>
+  <button class="pass-ov-btn" id="passOvBtn" onclick="pvpContinue()">I'm Player 2 — Ready! ⚔️</button>
 </div>
 <script>
 const EL_VAR={Spectro:'--Spectro',Havoc:'--Havoc',Aero:'--Aero',Glacio:'--Glacio',Electro:'--Electro',Fusion:'--Fusion',Physical:'--Physical'};
@@ -956,33 +1067,51 @@ function calcFirstTurn(){
   }
   G.startEnergy=G.energy;
   G.botStartEnergy=G.botEnergy;
+  if(G.mode==='pvp'){G.p2energy=G.botEnergy;}
 }
 
-function startBattle(){
+function startBattle(mode){
+  document.getElementById('modeSelectOv').classList.remove('show');
   const all=shuf([...RESONATORS]);
   const pt=pickBalancedTeam(all);
   const used=new Set(pt.map(r=>r.name));
   const et=pickBalancedTeam(all.filter(r=>!used.has(r.name)));
   G={player:pt.map(makeFighter),enemy:et.map(makeFighter),
-    energy:10,maxE:10,botEnergy:0,round:1,phase:'commit',hand:[],done:false,_passing:false,escalation:1};
+    energy:10,maxE:10,botEnergy:0,round:1,phase:'commit',hand:[],done:false,_passing:false,escalation:1,
+    mode:mode||'bot', pvpTurn:'p1', p2hand:[]};
   calcFirstTurn();
+  // Initial hand deal for player
   G.player.forEach(f=>buildLimitedHand(f.cardPool).slice(0,2).forEach(c=>{
     if(G.hand.length>=14)return;
     if(c.ult && G.hand.some(h=>h.ownerId===f.id&&h.ult)) return;
     if(c.variety && G.hand.some(h=>h.ownerId===f.id&&h.variety&&h.n===c.n)) return;
     G.hand.push({...c,ownerId:f.id,ownerName:f.name,hid:'h'+Math.random().toString(36).slice(2)});
   }));
+  // PvP: also deal initial hand for P2 (enemy team)
+  if(mode==='pvp'){
+    G.enemy.forEach(f=>buildLimitedHand(f.cardPool).slice(0,2).forEach(c=>{
+      if(G.p2hand.length>=14)return;
+      if(c.ult && G.p2hand.some(h=>h.ownerId===f.id&&h.ult)) return;
+      if(c.variety && G.p2hand.some(h=>h.ownerId===f.id&&h.variety&&h.n===c.n)) return;
+      G.p2hand.push({...c,ownerId:f.id,ownerName:f.name,hid:'h'+Math.random().toString(36).slice(2)});
+    }));
+  }
   showScreen('battleScreen');
   renderAll();
+  if(mode==='pvp'){
+    // Show round 1 P1 start overlay
+    showPvpP1StartOverlay();
+  }
 }
 
-function drawForFighter(f,n=1){
-  if(G.hand.length>=14)return;
+function drawForFighter(f,n=1,isP2=false){
+  const hand=isP2?G.p2hand:G.hand;
+  if(hand.length>=14)return;
   shuf(buildLimitedHand(f.cardPool)).slice(0,n).forEach(c=>{
-    if(G.hand.length>=14)return;
-    if(c.ult && G.hand.some(h=>h.ownerId===f.id&&h.ult)) return;
-    if(c.variety && G.hand.some(h=>h.ownerId===f.id&&h.variety&&h.n===c.n)) return;
-    G.hand.push({...c,ownerId:f.id,ownerName:f.name,hid:'h'+Math.random().toString(36).slice(2)});
+    if(hand.length>=14)return;
+    if(c.ult && hand.some(h=>h.ownerId===f.id&&h.ult)) return;
+    if(c.variety && hand.some(h=>h.ownerId===f.id&&h.variety&&h.n===c.n)) return;
+    hand.push({...c,ownerId:f.id,ownerName:f.name,hid:'h'+Math.random().toString(36).slice(2)});
   });
 }
 
@@ -1000,7 +1129,7 @@ function cardDesc(c,role){
   }
 }
 
-function renderFighter(f,isPlayer){
+function renderFighter(f,isPlayer,hideCommitted=false){
   const pct=Math.max(0,f.hp/f.maxHp*100);
   const boxCol=elC(f.el);
   const hpBarColor=pct>50?'var(--green)':pct>25?'var(--gold)':'var(--red)';
@@ -1029,15 +1158,24 @@ function renderFighter(f,isPlayer){
   if(!isPlayer)return`<div class="fighter enemy-fighter${f.alive?'':' dead'}${f.overdrive?' overdrive':''}" id="f-${f.id}">${header}</div>`;
   return`<div class="fighter${f.alive?'':' dead'}${f.overdrive?' overdrive':''}" id="f-${f.id}">
     ${header}
-    <div class="committed-fan" id="fan-${f.id}">${buildFan(f)}</div>
+    <div class="committed-fan" id="fan-${f.id}">${buildFan(f,hideCommitted)}</div>
   </div>`;
 }
 
-function buildFan(f){
+function buildFan(f,hideCommitted=false){
   if(!f.committed.length)return'';
   const total=f.committed.length;
   return f.committed.map((c,i)=>{
     const tc=typeCol(c.t),offset=i*14,rot=(i-(total-1)/2)*4,zIdx=i+1,execOrder=total-i;
+    if(hideCommitted){
+      return`<div class="fan-card fan-hidden"
+        style="left:${6+offset}px;z-index:${zIdx};transform:rotate(${rot}deg);"
+        title="Hidden">
+        <div class="fan-order">${execOrder}</div>
+        <div class="fan-ic">${c.ic}</div>
+        <div class="fan-tp" style="color:${tc}">${c.ult?'ULT':c.t.slice(0,3).toUpperCase()}</div>
+      </div>`;
+    }
     return`<div class="fan-card${c.ult?' ult-fan':''}"
       style="left:${6+offset}px;z-index:${zIdx};transform:rotate(${rot}deg);"
       draggable="true"
@@ -1055,7 +1193,7 @@ function buildFan(f){
 }
 
 function renderHandCard(hc){
-  const canUse=G.energy>=hc.c&&G.phase==='commit'&&!G.done;
+  const canUse=activeEnergy()>=hc.c&&G.phase==='commit'&&!G.done;
   const tc=typeCol(hc.t);
   const val=hc.t==='buff'?`+${Math.round((hc.bv||0)*100)}%ATK`:hc.t==='debuff'?`⬇️${Math.round((hc.dv||0.20)*100)}%ATK`:hc.v?`${hc.t==='attack'?'⚔️':'💚'}${hc.v}`:'';
   const typeLabel = hc.ult?'⭐ULT':hc.variety?`✦${hc.t.toUpperCase()}`:hc.t.toUpperCase();
@@ -1076,27 +1214,74 @@ function renderHandCard(hc){
 
 function discardCard(hid){
   if(G.phase!=='commit'||G.done)return;
-  G.hand=G.hand.filter(c=>c.hid!==hid);
+  if(G.mode==='pvp'&&G.pvpTurn==='p2'){
+    G.p2hand=G.p2hand.filter(c=>c.hid!==hid);
+  } else {
+    G.hand=G.hand.filter(c=>c.hid!==hid);
+  }
   renderAll();
 }
+
+function activeEnergy(){return(G.mode==='pvp'&&G.pvpTurn==='p2')?G.botEnergy:G.energy;}
+
 function renderAll(){
-  document.getElementById('playerCol').innerHTML=G.player.map(f=>renderFighter(f,true)).join('');
-  document.getElementById('enemyCol').innerHTML=G.enemy.map(f=>renderFighter(f,false)).join('');
-  // Split hand into 3 columns by owner role
-  const dpsCards=G.hand.filter(hc=>{const f=G.player.find(x=>x.name===hc.ownerName);return f&&f.role==='dps';});
-  const subCards=G.hand.filter(hc=>{const f=G.player.find(x=>x.name===hc.ownerName);return f&&f.role==='subdps';});
-  const suppCards=G.hand.filter(hc=>{const f=G.player.find(x=>x.name===hc.ownerName);return f&&f.role==='support';});
+  const isPvP=G.mode==='pvp';
+  const isP2Turn=isPvP&&G.pvpTurn==='p2';
+
+  // Team labels
+  if(isPvP){
+    document.getElementById('playerTeamLbl').textContent='P1';
+    document.getElementById('enemyTeamLbl').textContent='P2';
+  } else {
+    document.getElementById('playerTeamLbl').textContent='YOU';
+    document.getElementById('enemyTeamLbl').textContent='FOE';
+  }
+
+  // Fighters — during P2 turn, hide P1's committed fan (blind)
+  document.getElementById('playerCol').innerHTML=G.player.map(f=>renderFighter(f,true,isP2Turn&&G.pvpTurn==='p2')).join('');
+  document.getElementById('enemyCol').innerHTML=G.enemy.map(f=>renderFighter(f,isPvP&&isP2Turn,false)).join('');
+
+  // Hand display
+  let displayHand=G.hand;
+  let displayTeam=G.player;
+  if(isP2Turn){
+    displayHand=G.p2hand;
+    displayTeam=G.enemy;
+  }
+  const dpsCards=displayHand.filter(hc=>{const f=displayTeam.find(x=>x.name===hc.ownerName);return f&&f.role==='dps';});
+  const subCards=displayHand.filter(hc=>{const f=displayTeam.find(x=>x.name===hc.ownerName);return f&&f.role==='subdps';});
+  const suppCards=displayHand.filter(hc=>{const f=displayTeam.find(x=>x.name===hc.ownerName);return f&&f.role==='support';});
+
   document.getElementById('handDpsCards').innerHTML=dpsCards.map(renderHandCard).join('');
   document.getElementById('handSubCards').innerHTML=subCards.map(renderHandCard).join('');
   document.getElementById('handSuppCards').innerHTML=suppCards.map(renderHandCard).join('');
+
+  // Column label color for P2
+  const hz=document.getElementById('handZone');
+  if(isP2Turn) hz.classList.add('p2-active'); else hz.classList.remove('p2-active');
+
   document.getElementById('roundNum').textContent=G.round;
-  document.getElementById('enVal').textContent=G.energy;
-  document.getElementById('overdriveBar').style.display=(G.startEnergy>=G.maxE)?'flex':'none';
-  document.getElementById('guardBar').style.display=(G.player.some(f=>f.guard)&&G.round===1)?'flex':'none';
+  document.getElementById('enVal').textContent=activeEnergy();
+  document.getElementById('overdriveBar').style.display=
+    (isP2Turn?(G.botStartEnergy>=G.maxE):(G.startEnergy>=G.maxE))?'flex':'none';
+  document.getElementById('guardBar').style.display=
+    ((isP2Turn?G.enemy:G.player).some(f=>f.guard)&&G.round===1)?'flex':'none';
+
   const c=G.phase==='commit';
   document.getElementById('commitBtn').disabled=!c||G.done;
   document.getElementById('passBtn').disabled=!c||G.done;
-  document.getElementById('phaseLbl').textContent=c?'Tap cards to commit':'Resolving...';
+
+  // Phase label + PvP badge
+  const badge=document.getElementById('pvpTurnBadge');
+  if(isPvP&&c){
+    const who=isP2Turn?'P2':'P1';
+    document.getElementById('phaseLbl').textContent=`${who}: Commit cards`;
+    badge.textContent=isP2Turn?'⚔️ Player 2':'⚔️ Player 1';
+    badge.className='pvp-turn-badge show '+(isP2Turn?'p2':'p1');
+  } else {
+    document.getElementById('phaseLbl').textContent=c?'Tap cards to commit':'Resolving...';
+    badge.className='pvp-turn-badge';
+  }
 }
 
 function updateFighterDOM(f){
@@ -1125,18 +1310,24 @@ function hcTouchCancel(hid){clearTimeout(lpTimer);hideCardDetail();lpActive=fals
 
 function hcTap(hid){
   if(G.phase!=='commit'||G.done)return;
-  const hc=G.hand.find(c=>c.hid===hid);if(!hc)return;
-  const f=G.player.find(x=>x.name===hc.ownerName&&x.alive);if(!f)return;
-  if(G.energy<hc.c)return;
-  G.energy-=hc.c;
+  const isP2=G.mode==='pvp'&&G.pvpTurn==='p2';
+  const hand=isP2?G.p2hand:G.hand;
+  const team=isP2?G.enemy:G.player;
+  const hc=hand.find(c=>c.hid===hid);if(!hc)return;
+  const f=team.find(x=>x.name===hc.ownerName&&x.alive);if(!f)return;
+  const energy=activeEnergy();
+  if(energy<hc.c)return;
+  if(isP2) G.botEnergy-=hc.c; else G.energy-=hc.c;
   f.committed.push({...hc});
-  G.hand=G.hand.filter(c=>c.hid!==hid);
+  if(isP2) G.p2hand=G.p2hand.filter(c=>c.hid!==hid);
+  else G.hand=G.hand.filter(c=>c.hid!==hid);
   renderAll();
 }
 
 function showCardDetail(hid,touch){
-  const hc=G.hand.find(c=>c.hid===hid);if(!hc)return;
-  const f=G.player.find(x=>x.name===hc.ownerName);
+  const hc=activeHand().find(c=>c.hid===hid);if(!hc)return;
+  const fighters=activeFighters();
+  const f=fighters.find(x=>x.name===hc.ownerName);
   const tc=typeCol(hc.t);
   const val=hc.t==='buff'?`+${Math.round((hc.bv||0)*100)}% ATK`:hc.t==='debuff'?`⬇️ ${Math.round((hc.dv||0.20)*100)}% ATK`:hc.v?`${hc.t==='attack'?'⚔️ ':'💚 '}${hc.v}`:'';
   const desc=cardDesc(hc,f?f.role:'dps');
@@ -1173,10 +1364,13 @@ document.addEventListener('mouseup',e=>{
 
 function unplace(fid,idx){
   if(G.phase!=='commit'||G.done)return;
-  const f=G.player.find(x=>x.id===fid);if(!f)return;
+  const isP2=G.mode==='pvp'&&G.pvpTurn==='p2';
+  const team=isP2?G.enemy:G.player;
+  const f=team.find(x=>x.id===fid);if(!f)return;
   const card=f.committed[idx];if(!card)return;
-  G.energy+=card.c;
-  G.hand.push({...card,hid:'h'+Math.random().toString(36).slice(2)});
+  if(isP2) G.botEnergy+=card.c; else G.energy+=card.c;
+  const newCard={...card,hid:'h'+Math.random().toString(36).slice(2)};
+  if(isP2) G.p2hand.push(newCard); else G.hand.push(newCard);
   f.committed.splice(idx,1);
   renderAll();
 }
@@ -1220,20 +1414,47 @@ function showCombo(text){
 
 function passRound(){
   if(G.phase!=='commit'||G.done) return;
-  G.player.forEach(f=>{
+  const isP2=G.mode==='pvp'&&G.pvpTurn==='p2';
+  const team=isP2?G.enemy:G.player;
+  const hand=isP2?G.p2hand:G.hand;
+  team.forEach(f=>{
     f.committed.forEach(card=>{
-      G.energy+=card.c;
-      G.hand.push({...card,hid:'h'+Math.random().toString(36).slice(2)});
+      if(isP2) G.botEnergy+=card.c; else G.energy+=card.c;
+      hand.push({...card,hid:'h'+Math.random().toString(36).slice(2)});
     });
     f.committed=[];
   });
+  if(isP2){G.p2hand=[...hand]; /* already mutated */}
   G._passing=true;
   commitRound();
 }
 
 function commitRound(){
   if(G.phase!=='commit'||G.done)return;
-  if(!G.player.some(f=>f.alive&&f.committed.length>0)){
+
+  // PvP: after P1 commits, show pass overlay for P2
+  if(G.mode==='pvp'&&G.pvpTurn==='p1'){
+    if(!G.player.some(f=>f.alive&&f.committed.length>0)){
+      if(!G._passing){
+        const lbl=document.getElementById('phaseLbl');
+        lbl.style.color='var(--red)';setTimeout(()=>lbl.style.color='',800);
+        return;
+      }
+    }
+    G._passing=false;
+    G.pvpTurn='p2';
+    // Show pass overlay
+    const ov=document.getElementById('passOv');
+    document.getElementById('passOvTitle').textContent='Pass to Player 2! 📱';
+    document.getElementById('passOvMsg').innerHTML=`Player 1 has locked in their moves.<br>Don't show Player 2 the screen — pass the device!`;
+    ov.classList.add('show');
+    return;
+  }
+
+  // PvP P2 commit → now resolve; or bot mode → resolve directly
+  const isP2=G.mode==='pvp'&&G.pvpTurn==='p2';
+  if(!G.player.some(f=>f.alive&&f.committed.length>0)&&
+     !G.enemy.some(f=>f.alive&&f.committed.length>0)){
     if(!G._passing){
       const lbl=document.getElementById('phaseLbl');
       lbl.style.color='var(--red)';setTimeout(()=>lbl.style.color='',800);
@@ -1246,12 +1467,13 @@ function commitRound(){
   const botOD=G.botStartEnergy>=G.maxE;
   if(playerOD)G.player.filter(f=>f.alive).forEach(f=>{f.overdrive=true;floatDmg(f.id,'⚡ OD','overdrive');});
   if(botOD)   G.enemy.filter(f=>f.alive).forEach(f=>{f.overdrive=true;});
-  // Shields apply only to fighters who committed cards this round
   applyPassiveShields(G.player.filter(f=>f.alive&&f.committed.length>0));
   applyPassiveShields(G.enemy.filter(f=>f.alive&&f.committed.length>0));
   renderAll();
   const playerActs=G.player.filter(f=>f.alive&&f.committed.length>0).map(f=>({fighter:f,side:'player'}));
-  const botActs=buildBotActs();
+  const botActs=G.mode==='pvp'
+    ? G.enemy.filter(f=>f.alive&&f.committed.length>0).map(f=>({fighter:f,side:'enemy'}))
+    : buildBotActs();
   const combos=detectCombos(playerActs);
   const allActs=[...playerActs,...botActs].sort((a,b)=>{
     const da=a.fighter.guard?Math.max(a.fighter.def,a.fighter.atk,a.fighter.hp/10):a.fighter.def;
@@ -1264,6 +1486,12 @@ function commitRound(){
     delay+=act.fighter.committed.length*520+500;
   });
   setTimeout(()=>{if(!G.done)newRound();},delay+400);
+}
+
+// Called when P2 taps "Ready" after receiving the device
+function pvpContinue(){
+  document.getElementById('passOv').classList.remove('show');
+  renderAll();
 }
 
 function buildBotActs(){
@@ -1338,7 +1566,8 @@ function fanDragLeave(e){e.currentTarget.classList.remove('drag-over');}
 function fanDrop(e,fid,toIdx){
   e.preventDefault();e.currentTarget.classList.remove('drag-over');
   if(_dragFid!==fid||_dragIdx===null||_dragIdx===toIdx)return;
-  const f=G.player.find(x=>x.id===fid);if(!f)return;
+  const fighters=activeFighters();
+  const f=fighters.find(x=>x.id===fid);if(!f)return;
   const cards=f.committed;
   const moved=cards.splice(_dragIdx,1)[0];
   cards.splice(toIdx,0,moved);
@@ -1508,10 +1737,9 @@ function dealDmg(target,raw,atkEl){
 
 function newRound(){
   if(G.done)return;
-  // ── Shields RESET to 0 for everyone at round end — they do not carry over ──
   [...G.player,...G.enemy].forEach(f=>{
     f.committed=[];f.overdrive=false;f.guard=false;
-    f.shield=0; // Shields expire at round end
+    f.shield=0;
     if(f.buffRounds>0){f.buffRounds--;if(f.buffRounds===0)f.atkMult=1;}
     if(f.debuffRounds>0){f.debuffRounds--;if(f.debuffRounds===0){f.atk+=f.atkDebuffAmount||0;f.atkDebuffAmount=0;}}
   });
@@ -1525,8 +1753,18 @@ function newRound(){
   G.startEnergy=G.energy;
   G.botStartEnergy=G.botEnergy;
   G.phase='commit';
-  G.player.filter(f=>f.alive).forEach(f=>drawForFighter(f,1));
-
+  G.pvpTurn='p1';
+  G.player.filter(f=>f.alive).forEach(f=>drawForFighter(f,1,false));
+  if(G.mode==='pvp'){
+    G.enemy.filter(f=>f.alive).forEach(f=>drawForFighter(f,1,true));
+    // Show "pass to P1" overlay at start of new round
+    setTimeout(()=>{
+      const ov=document.getElementById('passOv');
+      document.getElementById('passOvTitle').textContent='New Round — Pass to Player 1! 📱';
+      document.getElementById('passOvMsg').innerHTML=`Round ${G.round} begins!<br>Hand the device to Player 1 to commit their cards.`;
+      ov.classList.add('show');
+    },400);
+  }
   renderAll();
   checkWin();
 }
@@ -1569,16 +1807,22 @@ function animF(fid,cls){
 function showPeek(fid,e){
   if(e)e.stopPropagation();
   const f=G.player.find(x=>x.id===fid)||G.enemy.find(x=>x.id===fid);if(!f)return;
-  const isPlayer=G.player.some(x=>x.id===fid);
-  document.getElementById('peekTitle').textContent=`${f.emoji} ${f.name} · ${isPlayer?'Your':'Enemy'} Cards`;
+  const isPlayerFighter=G.player.some(x=>x.id===fid);
+  const pvp=G.mode==='pvp';
+  const isActivePlayer = !pvp
+    || (G.pvpTurn==='p1' && isPlayerFighter)
+    || (G.pvpTurn==='p2' && !isPlayerFighter)
+    || G.phase==='resolve';
+  document.getElementById('peekTitle').textContent=`${f.emoji} ${f.name} · ${isActivePlayer?'Your':'Enemy'} Cards`;
   document.getElementById('peekCards').innerHTML=f.cardPool.map(c=>{
     const tc=typeCol(c.t);
     const val=c.t==='buff'?`+${Math.round((c.bv||0)*100)}%ATK`:c.t==='debuff'?`⬇️${Math.round((c.dv||0.20)*100)}%ATK`:c.v?`${c.t==='attack'?'⚔️':'💚'}${c.v}`:'';
     const desc=cardDesc(c,f.role);
     let badge='';
-    if(isPlayer){
+    if(isActivePlayer){
       const committed=f.committed.some(h=>h.n===c.n);
-      const inHand=G.hand.some(h=>h.ownerName===f.name&&h.n===c.n);
+      const hand=isPlayerFighter?G.hand:G.p2hand;
+      const inHand=(hand||[]).some(h=>h.ownerName===f.name&&h.n===c.n);
       if(committed)badge=`<div style="font-size:.34rem;color:var(--gold);font-weight:700">✓ QUEUED</div>`;
       else if(inHand)badge=`<div style="font-size:.34rem;color:var(--green)">in hand</div>`;
     }
@@ -1612,14 +1856,26 @@ function checkWin(){
   else if(!pa){G.done=true;setTimeout(()=>showResult(false),600);}
 }
 function showResult(won){
+  const pvp=G.mode==='pvp';
   document.getElementById('resIcon').textContent=won?'🏆':'💀';
-  document.getElementById('resTitle').textContent=won?'Victory!':'Defeated...';
-  document.getElementById('resTitle').className='res-title '+(won?'win':'lose');
-  document.getElementById('resSub').textContent=won?`All enemies defeated in ${G.round} rounds!`:`Your team fell on round ${G.round}.`;
+  document.getElementById('resTitle').textContent=pvp?(won?'Player 1 Wins! 🏆':'Player 2 Wins! 🏆'):(won?'Victory!':'Defeated...');
+  document.getElementById('resTitle').className='res-title win';
+  document.getElementById('resSub').textContent=pvp
+    ?`Battle concluded on round ${G.round}!`
+    :(won?`All enemies defeated in ${G.round} rounds!`:`Your team fell on round ${G.round}.`);
   document.getElementById('resultOv').classList.add('show');
 }
-function goTitle(){document.getElementById('resultOv').classList.remove('show');document.getElementById('peekEl').style.display='none';showScreen('titleScreen');}
+function goTitle(){
+  document.getElementById('resultOv').classList.remove('show');
+  document.getElementById('peekEl').style.display='none';
+  document.getElementById('passOv').classList.remove('show');
+  showScreen('titleScreen');
+}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function showModeSelect(){document.getElementById('modeSelectOv').classList.add('show');}
+function pvpContinue(){document.getElementById('passOv').classList.remove('show');renderAll();}
+function activeHand(){return(G.mode==='pvp'&&G.pvpTurn==='p2')?G.p2hand:G.hand;}
+function activeFighters(){return(G.mode==='pvp'&&G.pvpTurn==='p2')?G.enemy:G.player;}
 </script>
 </body>
 </html>
