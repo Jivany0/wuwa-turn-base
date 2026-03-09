@@ -323,6 +323,30 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
   border:none;border-radius:10px;color:#0a0b14;font-family:'Cinzel',serif;
   font-size:.86rem;font-weight:600;cursor:pointer;transition:all .2s;}
 .again-btn:hover{transform:translateY(-2px);}
+
+/* ── Elemental chart strip ── */
+.el-chart{display:flex;align-items:center;gap:3px;padding:2px 8px;
+  border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;background:rgba(7,8,15,.7);}
+.el-chart::-webkit-scrollbar{display:none;}
+.el-chip{display:flex;align-items:center;gap:2px;font-size:.32rem;padding:1px 4px;
+  border-radius:4px;white-space:nowrap;border:1px solid rgba(255,255,255,.07);}
+.el-chart-lbl{font-size:.3rem;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-right:2px;flex-shrink:0;}
+
+/* ── Flying card animation ── */
+.card-fly{position:fixed;z-index:600;pointer-events:none;
+  width:40px;height:56px;border-radius:7px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  border:1px solid rgba(212,168,67,.6);background:var(--surface3);
+  box-shadow:0 4px 20px rgba(0,0,0,.7);
+  transition:left .32s cubic-bezier(.4,0,.2,1),top .32s cubic-bezier(.4,0,.2,1),
+             transform .32s cubic-bezier(.4,0,.2,1),opacity .18s ease;}
+.card-fly-ic{font-size:1.1rem;line-height:1;}
+.card-fly-nm{font-size:.3rem;font-weight:700;text-align:center;color:var(--text);}
+.card-fly-tp{font-size:.26rem;text-transform:uppercase;font-weight:700;}
+
+/* ── Fan card drag reorder ── */
+.fan-card.drag-over{border-color:var(--gold2)!important;box-shadow:0 0 10px rgba(212,168,67,.6)!important;}
+.fan-card.dragging{opacity:.35;}
 </style>
 </head>
 <body>
@@ -357,6 +381,16 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
       <button class="pass-btn" id="passBtn" onclick="passRound()">⏭ Pass</button>
       <button class="commit-btn" id="commitBtn" onclick="commitRound()">⚔️ Commit</button>
     </div>
+  </div>
+  <div class="el-chart">
+    <span class="el-chart-lbl">⚗️ Elements:</span>
+    <span class="el-chip" style="color:var(--Spectro);border-color:rgba(232,216,74,.2)">🌟Spectro <span style="color:var(--dim2)">weak vs</span> <span style="color:var(--Havoc)">Havoc</span></span>
+    <span class="el-chip" style="color:var(--Havoc);border-color:rgba(192,96,216,.2)">💜Havoc <span style="color:var(--dim2)">weak vs</span> <span style="color:var(--Aero)">Aero</span></span>
+    <span class="el-chip" style="color:var(--Aero);border-color:rgba(74,208,192,.2)">🌊Aero <span style="color:var(--dim2)">weak vs</span> <span style="color:var(--Electro)">Electro</span></span>
+    <span class="el-chip" style="color:var(--Electro);border-color:rgba(144,112,240,.2)">⚡Electro <span style="color:var(--dim2)">weak vs</span> <span style="color:var(--Glacio)">Glacio</span></span>
+    <span class="el-chip" style="color:var(--Glacio);border-color:rgba(112,184,240,.2)">❄️Glacio <span style="color:var(--dim2)">weak vs</span> <span style="color:var(--Fusion)">Fusion</span></span>
+    <span class="el-chip" style="color:var(--Fusion);border-color:rgba(240,120,64,.2)">🔥Fusion <span style="color:var(--dim2)">weak vs</span> <span style="color:var(--Spectro)">Spectro</span></span>
+    <span class="el-chip" style="color:var(--dim2);border-color:rgba(255,255,255,.08)">🛡️Same element = 10% resist</span>
   </div>
   <div class="arena">
     <div class="fighters-row">
@@ -930,7 +964,7 @@ function startBattle(){
   const used=new Set(pt.map(r=>r.name));
   const et=pickBalancedTeam(all.filter(r=>!used.has(r.name)));
   G={player:pt.map(makeFighter),enemy:et.map(makeFighter),
-    energy:10,maxE:10,botEnergy:0,round:1,phase:'commit',hand:[],done:false,_passing:false};
+    energy:10,maxE:10,botEnergy:0,round:1,phase:'commit',hand:[],done:false,_passing:false,escalation:1};
   calcFirstTurn();
   G.player.forEach(f=>buildLimitedHand(f.cardPool).slice(0,2).forEach(c=>{
     if(G.hand.length>=14)return;
@@ -1006,7 +1040,13 @@ function buildFan(f){
     const tc=typeCol(c.t),offset=i*14,rot=(i-(total-1)/2)*4,zIdx=i+1,execOrder=total-i;
     return`<div class="fan-card${c.ult?' ult-fan':''}"
       style="left:${6+offset}px;z-index:${zIdx};transform:rotate(${rot}deg);"
-      onclick="unplace('${f.id}',${i})" title="Tap to remove · ${c.n}">
+      draggable="true"
+      ondragstart="fanDragStart(event,'${f.id}',${i})"
+      ondragover="fanDragOver(event)"
+      ondragleave="fanDragLeave(event)"
+      ondrop="fanDrop(event,'${f.id}',${i})"
+      ondragend="fanDragEnd(event)"
+      onclick="unplace('${f.id}',${i})" title="Drag to reorder · Tap to remove · ${c.n}">
       <div class="fan-order">${execOrder}</div>
       <div class="fan-ic">${c.ic}</div>
       <div class="fan-tp" style="color:${tc}">${c.ult?'ULT':c.t.slice(0,3).toUpperCase()}</div>
@@ -1221,7 +1261,7 @@ function commitRound(){
   let delay=300;
   allActs.forEach(act=>{
     setTimeout(()=>{if(!G.done)executeAct(act,combos);},delay);
-    delay+=act.fighter.committed.length*700+400;
+    delay+=act.fighter.committed.length*520+500;
   });
   setTimeout(()=>{if(!G.done)newRound();},delay+400);
 }
@@ -1261,6 +1301,78 @@ function applyPassiveShields(allies){
     updateFighterDOM(f);
   });
 }
+// ── Web Audio sounds ──
+let _audioCtx=null;
+function getAudio(){if(!_audioCtx)_audioCtx=new(window.AudioContext||window.webkitAudioContext)();return _audioCtx;}
+function playSound(type){
+  try{
+    const ctx=getAudio();
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    const t=ctx.currentTime;
+    switch(type){
+      case 'attack': o.type='sawtooth';o.frequency.setValueAtTime(220,t);o.frequency.exponentialRampToValueAtTime(80,t+0.18);g.gain.setValueAtTime(0.18,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.2);break;
+      case 'ult':    o.type='square';o.frequency.setValueAtTime(440,t);o.frequency.setValueAtTime(660,t+0.08);o.frequency.setValueAtTime(880,t+0.16);g.gain.setValueAtTime(0.22,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.45);break;
+      case 'heal':   o.type='sine';o.frequency.setValueAtTime(523,t);o.frequency.exponentialRampToValueAtTime(783,t+0.22);g.gain.setValueAtTime(0.12,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.3);break;
+      case 'buff':   o.type='triangle';o.frequency.setValueAtTime(392,t);o.frequency.exponentialRampToValueAtTime(523,t+0.18);g.gain.setValueAtTime(0.1,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.25);break;
+      case 'defend': o.type='triangle';o.frequency.setValueAtTime(300,t);o.frequency.exponentialRampToValueAtTime(180,t+0.2);g.gain.setValueAtTime(0.12,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.22);break;
+      case 'debuff': o.type='sawtooth';o.frequency.setValueAtTime(180,t);o.frequency.exponentialRampToValueAtTime(60,t+0.25);g.gain.setValueAtTime(0.14,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.28);break;
+      case 'crit':   o.type='square';o.frequency.setValueAtTime(880,t);o.frequency.exponentialRampToValueAtTime(440,t+0.12);g.gain.setValueAtTime(0.2,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.18);break;
+    }
+    o.start(t);o.stop(t+0.5);
+  }catch(e){}
+}
+
+// ── Fan drag reorder ──
+let _dragFid=null,_dragIdx=null;
+function fanDragStart(e,fid,idx){
+  _dragFid=fid;_dragIdx=idx;
+  e.target.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+}
+function fanDragOver(e){
+  e.preventDefault();e.dataTransfer.dropEffect='move';
+  e.currentTarget.classList.add('drag-over');
+}
+function fanDragLeave(e){e.currentTarget.classList.remove('drag-over');}
+function fanDrop(e,fid,toIdx){
+  e.preventDefault();e.currentTarget.classList.remove('drag-over');
+  if(_dragFid!==fid||_dragIdx===null||_dragIdx===toIdx)return;
+  const f=G.player.find(x=>x.id===fid);if(!f)return;
+  const cards=f.committed;
+  const moved=cards.splice(_dragIdx,1)[0];
+  cards.splice(toIdx,0,moved);
+  _dragFid=null;_dragIdx=null;
+  renderAll();
+}
+function fanDragEnd(e){
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.fan-card.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  _dragFid=null;_dragIdx=null;
+}
+
+// ── Flying card animation ──
+function flyCard(card,fromId,toId,cb){
+  const fe=document.getElementById('f-'+fromId);
+  const te=document.getElementById('f-'+toId);
+  if(!fe||!te){cb();return;}
+  const fr=fe.getBoundingClientRect(),tr=te.getBoundingClientRect();
+  const tc=typeCol(card.t);
+  const fly=document.createElement('div');
+  fly.className='card-fly';
+  fly.innerHTML=`<div class="card-fly-ic">${card.ic}</div><div class="card-fly-nm">${card.n}</div><div class="card-fly-tp" style="color:${tc}">${card.ult?'ULT':card.t.slice(0,3).toUpperCase()}</div>`;
+  fly.style.left=(fr.left+fr.width/2-20)+'px';
+  fly.style.top=(fr.top+fr.height/2-28)+'px';
+  fly.style.transform='scale(1.1) rotate(-6deg)';
+  document.body.appendChild(fly);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    fly.style.left=(tr.left+tr.width/2-20)+'px';
+    fly.style.top=(tr.top+tr.height/2-28)+'px';
+    fly.style.transform='scale(0.7) rotate(6deg)';
+  }));
+  setTimeout(()=>{fly.style.opacity='0';setTimeout(()=>{fly.remove();cb();},160);},340);
+}
+
 function executeAct(act,combos={}){
   const{fighter:f,side}=act;
   const isPlayer=side==='player';
@@ -1270,24 +1382,33 @@ function executeAct(act,combos={}){
   if(!owner||!owner.alive)return;
   const comboMult=combos[owner.id]||1;
   const odMult=owner.overdrive?1.1:1.0;
+
+  // FILO — reverse the committed order for execution
   const buffCards=owner.committed.filter(c=>c.t==='buff');
   const restCards=owner.committed.filter(c=>c.t!=='buff');
-  [...buffCards,...restCards].forEach((card,ci)=>{
+  const execOrder=[...buffCards,...restCards].reverse();
+
+  execOrder.forEach((card,ci)=>{
     setTimeout(()=>{
       if(!owner.alive)return;
       animF(owner.id,'attacking-anim');
       const aliveFoes=foes.filter(r=>r.alive);
       const aliveAllies=allies.filter(r=>r.alive);
+
       if(card.t==='attack'){
         if(!aliveFoes.length)return;
         const target=pickTarget(aliveFoes,owner.role,card.t);
         const raw=Math.round(card.v*owner.atkMult*(owner.atk/70)*comboMult*odMult);
-        const res=dealDmg(target,raw,owner.el);
-        fireProj(owner.id,target.id,owner.el,()=>{
+        playSound(card.ult?'ult':'attack');
+        flyCard(card,owner.id,target.id,()=>{
+          const res=dealDmg(target,raw,owner.el);
           animF(target.id,'taking-hit');
+          if(res.isCrit)playSound('crit');
           const cls=card.ult?'ult':res.isCrit?'crit':res.resist?'resist':'dmg';
           floatDmg(target.id,`-${res.dmg}${res.isCrit?' CRIT!':''}`,cls);
+          if(res.absorbed>0)floatDmg(target.id,`🛡️-${res.absorbed}`,'buff');
           updateFighterDOM(target);
+          fireProj(owner.id,target.id,owner.el,()=>{});
           checkWin();
         });
       } else if(card.t==='debuff'){
@@ -1297,36 +1418,63 @@ function executeAct(act,combos={}){
         target.atk=Math.max(1,target.atk-reduction);
         target.debuffRounds=(target.debuffRounds||0)+1;
         target.atkDebuffAmount=(target.atkDebuffAmount||0)+reduction;
-        fireProj(owner.id,target.id,owner.el,()=>{
+        playSound('debuff');
+        flyCard(card,owner.id,target.id,()=>{
           animF(target.id,'taking-hit');
-          floatDmg(target.id,`⬇️ATK -${reduction} (${Math.round((card.dv||0.20)*100)}%)`,'debuff');
+          floatDmg(target.id,`⬇️ATK -${reduction}`,'debuff');
           updateFighterDOM(target);
         });
       } else if(card.t==='defend'){
         const sh=card.v;
         owner.shield+=sh;
-        animF(owner.id,'healing-anim');
-        floatDmg(owner.id,`+${sh}🛡️`,'buff');
-        updateFighterDOM(owner);
+        playSound('defend');
+        flyCard(card,owner.id,owner.id,()=>{
+          animF(owner.id,'healing-anim');
+          floatDmg(owner.id,`+${sh}🛡️`,'buff');
+          updateFighterDOM(owner);
+        });
       } else if(card.t==='heal'){
         const healAmt=Math.round(card.v*(1+owner.def/100));
         const lowestAlly=aliveAllies.filter(a=>a.id!==owner.id).sort((a,b)=>(a.hp/a.maxHp)-(b.hp/b.maxHp))[0];
         const mainHeal=Math.round(healAmt*0.7),selfHeal=Math.round(healAmt*0.3);
-        if(lowestAlly){lowestAlly.hp=Math.min(lowestAlly.maxHp,lowestAlly.hp+mainHeal);animF(lowestAlly.id,'healing-anim');floatDmg(lowestAlly.id,`+${mainHeal}💚`,'heal');updateFighterDOM(lowestAlly);}
-        owner.hp=Math.min(owner.maxHp,owner.hp+selfHeal);animF(owner.id,'healing-anim');floatDmg(owner.id,`+${selfHeal}💚`,'heal');updateFighterDOM(owner);
+        playSound('heal');
+        if(lowestAlly){
+          flyCard(card,owner.id,lowestAlly.id,()=>{
+            lowestAlly.hp=Math.min(lowestAlly.maxHp,lowestAlly.hp+mainHeal);
+            animF(lowestAlly.id,'healing-anim');
+            floatDmg(lowestAlly.id,`+${mainHeal}💚`,'heal');
+            updateFighterDOM(lowestAlly);
+          });
+        }
+        owner.hp=Math.min(owner.maxHp,owner.hp+selfHeal);
+        animF(owner.id,'healing-anim');
+        floatDmg(owner.id,`+${selfHeal}💚`,'heal');
+        updateFighterDOM(owner);
       } else if(card.t==='buff'){
         owner.atkMult=Math.min(2.5,(owner.atkMult||1)+(card.bv||.08));
         owner.buffRounds=1;
+        playSound('buff');
         if(owner.role==='support'){
           const topDPS=aliveAllies.filter(a=>a.id!==owner.id&&a.role==='dps').sort((a,b)=>b.atk-a.atk)[0];
-          if(topDPS){topDPS.atkMult=Math.min(2.5,(topDPS.atkMult||1)+(card.bv||.08)*0.7);topDPS.buffRounds=1;animF(topDPS.id,'healing-anim');floatDmg(topDPS.id,`+${Math.round((card.bv||.08)*70)}%ATK`,'buff');updateFighterDOM(topDPS);}
+          if(topDPS){
+            flyCard(card,owner.id,topDPS.id,()=>{
+              topDPS.atkMult=Math.min(2.5,(topDPS.atkMult||1)+(card.bv||.08)*0.7);
+              topDPS.buffRounds=1;
+              animF(topDPS.id,'healing-anim');
+              floatDmg(topDPS.id,`+${Math.round((card.bv||.08)*70)}%ATK`,'buff');
+              updateFighterDOM(topDPS);
+            });
+          }
           floatDmg(owner.id,`+${Math.round((card.bv||.08)*30)}%ATK`,'buff');
         } else {
-          floatDmg(owner.id,`+${Math.round((card.bv||.08)*100)}%ATK`,'buff');
+          flyCard(card,owner.id,owner.id,()=>{
+            floatDmg(owner.id,`+${Math.round((card.bv||.08)*100)}%ATK`,'buff');
+          });
         }
-        animF(owner.id,'healing-anim');updateFighterDOM(owner);
+        animF(owner.id,'healing-anim');
+        updateFighterDOM(owner);
       }
-    },ci*350);
+    },ci*520);
   });
 }
 
@@ -1350,7 +1498,7 @@ function dealDmg(target,raw,atkEl){
   const critMult=isCrit?1.3:1.0;
   const defReduction=target.def*0.3;
   const guardBonus=target.guard?target.def*0.2:0;
-  let dmg=Math.max(1,Math.round(raw*resMult*critMult-defReduction-guardBonus));
+  let dmg=Math.max(1,Math.round(raw*resMult*critMult*G.escalation-defReduction-guardBonus));
   let absorbed=0;
   if(target.shield>0){absorbed=Math.min(target.shield,dmg);target.shield-=absorbed;dmg-=absorbed;}
   target.hp=Math.max(0,target.hp-dmg);
@@ -1368,6 +1516,10 @@ function newRound(){
     if(f.debuffRounds>0){f.debuffRounds--;if(f.debuffRounds===0){f.atk+=f.atkDebuffAmount||0;f.atkDebuffAmount=0;}}
   });
   G.round++;
+  if(G.round>1&&G.round%10===1){
+    G.escalation=+(G.escalation+0.10).toFixed(2);
+    showCombo(`⚠️ Damage Escalation! ×${G.escalation.toFixed(1)}`);
+  }
   G.energy=Math.min(G.maxE,G.energy+3);
   G.botEnergy=Math.min(G.maxE,G.botEnergy+3);
   G.startEnergy=G.energy;
