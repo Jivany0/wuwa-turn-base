@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>WuWa Battle</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -23,11 +22,8 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
   background-image:
     radial-gradient(ellipse at 15% 60%,rgba(90,50,160,.08) 0%,transparent 55%),
     radial-gradient(ellipse at 85% 20%,rgba(212,168,67,.05) 0%,transparent 50%);}
-
 .screen{display:none;width:100vw;height:100vh;}
 .screen.active{display:flex;flex-direction:column;}
-
-/* ══ TITLE ══ */
 #titleScreen{align-items:center;justify-content:center;gap:16px;padding:30px 20px;text-align:center;}
 .title-logo{font-family:'Cinzel',serif;font-size:clamp(2.8rem,9vw,5.5rem);font-weight:900;
   background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold));
@@ -43,27 +39,23 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
 .title-tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:-4px;}
 .title-tag{font-size:.58rem;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,.04);
   border:1px solid var(--border);color:var(--dim2);letter-spacing:.08em;}
-
-/* ══ BATTLE LAYOUT ══ */
 #battleScreen{flex-direction:column;overflow:hidden;}
-
-/* Top bar — tight, no wasted space */
-.top-bar{
-  display:flex;align-items:center;justify-content:space-between;
+.top-bar{display:flex;align-items:center;justify-content:space-between;
   padding:4px 10px;border-bottom:1px solid var(--border);flex-shrink:0;
-  background:rgba(7,8,15,.95);backdrop-filter:blur(6px);gap:8px;
-}
+  background:rgba(7,8,15,.95);backdrop-filter:blur(6px);gap:8px;}
 .top-bar-left{display:flex;align-items:center;gap:8px;}
-.top-bar-right{display:flex;align-items:center;}
+.top-bar-right{display:flex;align-items:center;gap:5px;}
+.pass-btn{padding:6px 12px;background:rgba(255,255,255,.04);
+  border:1px solid var(--border);border-radius:7px;color:var(--dim2);font-family:'Cinzel',serif;
+  font-size:.7rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.pass-btn:hover:not(:disabled){background:rgba(255,255,255,.08);color:var(--text);}
+.pass-btn:disabled{opacity:.4;cursor:not-allowed;}
 .top-divider{width:1px;height:20px;background:var(--border);flex-shrink:0;}
 .round-badge{font-family:'Cinzel',serif;font-size:.88rem;color:var(--gold);font-weight:700;line-height:1;}
 .round-lbl{font-size:.38rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);}
-
-/* Energy — just the number, prominent */
 .en-block{display:flex;align-items:baseline;gap:3px;}
 .en-lbl{font-size:.65rem;color:var(--blue);}
 .en-val{font-size:1.2rem;color:var(--blue);font-weight:900;font-family:'Cinzel',serif;line-height:1;}
-
 .overdrive-banner{padding:2px 7px;border-radius:5px;
   background:linear-gradient(90deg,rgba(212,168,67,.1),rgba(212,168,67,.2),rgba(212,168,67,.1));
   border:1px solid rgba(212,168,67,.4);font-size:.42rem;font-weight:700;
@@ -81,51 +73,31 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
   transition:all .2s;box-shadow:0 3px 12px rgba(212,168,67,.2);white-space:nowrap;}
 .commit-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 18px rgba(212,168,67,.35);}
 .commit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
-
-/* Arena: column — fighters row on top, hand row on bottom */
 .arena{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
-
-/* ROW 1 — ALL 6 fighters side by side, ~65% height */
-.fighters-row{
-  display:flex;flex-direction:row;flex:0 0 62%;min-height:0;
-  padding:4px 6px 2px;gap:4px;align-items:stretch;
-  border-bottom:1px solid var(--border);
-}
-
-/* Divider between teams */
-.teams-divider{
-  width:1px;background:var(--border);flex-shrink:0;align-self:stretch;margin:4px 0;
-}
-
-/* Each team's 3 fighters — horizontal */
+.fighters-row{display:flex;flex-direction:row;flex:0 0 62%;min-height:0;
+  padding:4px 6px 2px;gap:4px;align-items:stretch;border-bottom:1px solid var(--border);}
+.teams-divider{width:1px;background:var(--border);flex-shrink:0;align-self:stretch;margin:4px 0;}
 .team-fighters{display:flex;flex-direction:row;gap:4px;flex:1;min-width:0;}
-
-/* Team label — vertical on the side */
-.team-label{
-  font-size:.36rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
-  writing-mode:vertical-rl;flex-shrink:0;padding:0 2px;align-self:center;
+.team-label{font-size:.36rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+  writing-mode:vertical-rl;flex-shrink:0;padding:0 2px;align-self:center;}
+.hand-zone-3col{display:flex;flex-direction:row;flex:1;min-height:0;overflow:hidden;}
+.hand-col{display:flex;flex-direction:column;flex:1;min-width:0;padding:3px 6px;}
+.hand-col-lbl{font-size:.38rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:3px;flex-shrink:0;}
+.dps-lbl{color:#e74c3c;}
+.sub-lbl{color:var(--gold);}
+.supp-lbl{color:#2ecc71;}
+.hand-col-cards{display:flex;flex-direction:row;flex-wrap:wrap;gap:4px;overflow-y:auto;align-content:flex-start;}
+.hand-col-cards::-webkit-scrollbar{width:3px;}
+.hand-col-cards::-webkit-scrollbar-thumb{background:rgba(212,168,67,.2);border-radius:2px;}
+.hand-col-divider{width:1px;background:var(--border);flex-shrink:0;margin:4px 0;}
+@media (min-width:1100px){
+  .hand-col{padding:6px 10px;}
+  .hand-col-lbl{font-size:.62rem;margin-bottom:5px;}
+  .hand-col-cards{gap:8px;}
 }
-
-/* ROW 2 — card hand, ~38% height */
-.hand-row{
-  flex:1;display:flex;flex-direction:row;align-items:center;
-  padding:4px 8px;gap:5px;overflow-x:auto;
-  min-height:0;
-}
-.hand-row::-webkit-scrollbar{height:3px;}
-.hand-row::-webkit-scrollbar-thumb{background:rgba(212,168,67,.2);border-radius:2px;}
-.hand-row-lbl{
-  font-size:.36rem;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--dim);writing-mode:vertical-rl;flex-shrink:0;padding:0 2px;
-}
-
-/* ══ FIGHTER CARD ══ */
-.fighter{
-  background:var(--surface);border:1px solid var(--border);border-radius:9px;
+.fighter{background:var(--surface);border:1px solid var(--border);border-radius:9px;
   display:flex;flex-direction:column;position:relative;
-  transition:border-color .25s,box-shadow .25s;overflow:visible;
-  flex:1;min-width:0;min-height:0;
-}
+  transition:border-color .25s,box-shadow .25s;overflow:visible;flex:1;min-width:0;min-height:0;}
 .fighter.dead{opacity:.22;filter:grayscale(1);pointer-events:none;}
 .fighter.taking-hit{animation:hitShake .32s ease;}
 .fighter.attacking-anim{animation:fwdPop .38s ease;}
@@ -136,16 +108,10 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
 @keyframes hitShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(4px)}}
 @keyframes fwdPop{0%,100%{transform:scale(1)}40%{transform:scale(1.08)}75%{transform:scale(.97)}}
 @keyframes healGlow{0%,100%{box-shadow:none}50%{box-shadow:0 0 14px rgba(46,204,113,.5)}}
-
-/* Fighter content — avatar top, stats below */
-.f-header{
-  display:flex;flex-direction:column;align-items:center;
-  padding:5px 5px 3px;cursor:pointer;flex:1;min-height:0;gap:3px;
-}
-.f-avatar{
-  width:32px;height:32px;flex-shrink:0;border-radius:7px;
-  display:flex;align-items:center;justify-content:center;font-size:1.05rem;
-}
+.f-header{display:flex;flex-direction:column;align-items:center;
+  padding:5px 5px 3px;cursor:pointer;flex:1;min-height:0;gap:3px;}
+.f-avatar{width:32px;height:32px;flex-shrink:0;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:1.05rem;}
 .f-body{width:100%;min-width:0;}
 .f-top{display:flex;align-items:center;justify-content:center;gap:2px;flex-wrap:wrap;}
 .f-name{font-size:.44rem;font-weight:700;white-space:nowrap;overflow:hidden;
@@ -166,74 +132,53 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
 .guard-pip{font-size:.32rem;padding:1px 2px;border-radius:3px;background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);}
 .overdrive-pip{font-size:.32rem;padding:1px 2px;border-radius:3px;background:rgba(212,168,67,.25);color:var(--gold2);border:1px solid rgba(212,168,67,.5);font-weight:700;}
 .peek-hint{font-size:.28rem;color:var(--dim);text-align:center;margin-top:1px;}
-
-/* Fan of committed cards — overlapping at bottom of fighter */
-.committed-fan{
-  position:relative;height:38px;flex-shrink:0;
-  padding:0 5px 4px;
-  border-top:1px solid rgba(255,255,255,.04);
-}
-.committed-fan:empty::after{
-  content:'—';font-size:.3rem;color:var(--dim);
-  position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
-}
-.fan-card{
-  position:absolute;width:26px;height:34px;border-radius:5px;
+.committed-fan{position:relative;height:38px;flex-shrink:0;padding:0 5px 4px;border-top:1px solid rgba(255,255,255,.04);}
+.committed-fan:empty::after{content:'—';font-size:.3rem;color:var(--dim);
+  position:absolute;bottom:6px;left:50%;transform:translateX(-50%);}
+.fan-card{position:absolute;width:26px;height:34px;border-radius:5px;
   background:var(--surface3);border:1px solid rgba(212,168,67,.35);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:1px;cursor:pointer;transition:opacity .15s;
-  box-shadow:0 2px 8px rgba(0,0,0,.5);
-}
+  gap:1px;cursor:pointer;transition:opacity .15s;box-shadow:0 2px 8px rgba(0,0,0,.5);}
 .fan-card:hover{opacity:.65;transform:translateY(-4px) !important;}
-.fan-card:active{opacity:.5;}
 .fan-card.ult-fan{border-color:rgba(212,168,67,.65);background:rgba(212,168,67,.12);}
 .fan-ic{font-size:.75rem;line-height:1;}
 .fan-tp{font-size:.26rem;font-weight:700;text-transform:uppercase;text-align:center;}
 .fan-order{position:absolute;top:1px;left:2px;font-size:.24rem;color:var(--gold);font-weight:700;}
-
-/* ══ HAND CARDS ══ */
-.hcard{
-  width:52px;height:72px;background:var(--surface2);
+.hcard{width:52px;height:72px;background:var(--surface2);
   border:1px solid rgba(255,255,255,.1);border-radius:9px;
   padding:4px 3px 3px;flex-shrink:0;position:relative;
   display:flex;flex-direction:column;align-items:center;gap:1px;
   transition:transform .12s,border-color .12s,opacity .12s;
-  user-select:none;-webkit-user-select:none;cursor:pointer;
-}
+  user-select:none;-webkit-user-select:none;cursor:pointer;}
 .hcard:active:not(.hcdis){transform:scale(.91);}
 .hcard.hcdis{opacity:.25;cursor:not-allowed;pointer-events:none;}
 .hcard.ultimate-card{border-color:rgba(212,168,67,.5);background:rgba(212,168,67,.06);}
+.hcard.variety-card{border-color:rgba(100,200,255,.45);background:rgba(80,160,255,.05);}
 .hcard.pressing{border-color:var(--gold);box-shadow:0 0 10px rgba(212,168,67,.4);}
 .hcard-cost{position:absolute;top:2px;right:2px;width:13px;height:13px;border-radius:50%;
   background:var(--blue);color:#fff;font-size:.46rem;font-weight:700;
   display:flex;align-items:center;justify-content:center;}
+.hcard-cost.free-cost{background:var(--green);}
 .hcard-ic{font-size:1.1rem;line-height:1;margin-top:2px;}
 .hcard-nm{font-size:.42rem;font-weight:700;text-align:center;line-height:1.2;color:var(--text);}
 .hcard-tp{font-size:.35rem;letter-spacing:.03em;text-transform:uppercase;}
 .hcard-vl{font-size:.55rem;font-weight:700;font-family:'Cinzel',serif;}
 .hcard-ow{font-size:.32rem;color:var(--dim);}
-
-/* Card detail popup (long press) */
-.card-detail{
-  position:fixed;z-index:750;background:var(--surface);
-  border:1px solid rgba(212,168,67,.4);border-radius:13px;
-  padding:12px;width:165px;
-  box-shadow:0 14px 44px rgba(0,0,0,.85);
-  animation:peekIn .15s ease;pointer-events:none;
-}
+.discard-btn{position:absolute;bottom:2px;right:2px;width:13px;height:13px;border-radius:50%;
+  background:rgba(231,76,60,.25);color:#e74c3c;font-size:.5rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1;
+  border:1px solid rgba(231,76,60,.4);transition:background .15s;}
+.discard-btn:hover{background:rgba(231,76,60,.55);}
+.card-detail{position:fixed;z-index:750;background:var(--surface);
+  border:1px solid rgba(212,168,67,.4);border-radius:13px;padding:12px;width:165px;
+  box-shadow:0 14px 44px rgba(0,0,0,.85);animation:peekIn .15s ease;pointer-events:none;}
 .cd-ic{font-size:2rem;text-align:center;display:block;}
-.cd-nm{font-family:'Cinzel',serif;font-size:.75rem;font-weight:700;
-  text-align:center;margin:4px 0 2px;color:var(--text);}
-.cd-type{font-size:.46rem;text-align:center;text-transform:uppercase;
-  letter-spacing:.08em;margin-bottom:5px;}
-.cd-vl{font-size:1rem;font-weight:900;font-family:'Cinzel',serif;
-  text-align:center;display:block;margin-bottom:4px;}
-.cd-desc{font-size:.48rem;color:var(--dim2);text-align:center;line-height:1.5;}
+.cd-nm{font-family:'Cinzel',serif;font-size:.75rem;font-weight:700;text-align:center;margin:4px 0 2px;color:var(--text);}
+.cd-type{font-size:.46rem;text-align:center;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;}
+.cd-vl{font-size:1rem;font-weight:900;font-family:'Cinzel',serif;text-align:center;display:block;margin-bottom:4px;}
+.cd-desc{font-size:.48rem;color:var(--dim2);text-align:center;line-height:1.5;white-space:pre-line;}
 .cd-cost{font-size:.44rem;color:var(--blue);text-align:center;margin-top:5px;}
-.cd-hint{font-size:.38rem;color:var(--dim);text-align:center;margin-top:4px;
-  border-top:1px solid var(--border);padding-top:4px;}
-
-/* Combo flash */
+.cd-hint{font-size:.38rem;color:var(--dim);text-align:center;margin-top:4px;border-top:1px solid var(--border);padding-top:4px;}
 .combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
   font-family:'Cinzel',serif;font-size:1.4rem;font-weight:900;color:var(--gold);
   text-shadow:0 0 20px rgba(212,168,67,.8);pointer-events:none;z-index:800;
@@ -242,12 +187,8 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
   30%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}
   70%{opacity:1;transform:translate(-50%,-50%) scale(1)}
   100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
-
-/* Projectile layer */
 #projLayer{position:fixed;inset:0;pointer-events:none;z-index:500;}
 .proj{position:fixed;pointer-events:none;transition:left .36s ease,top .36s ease,transform .36s ease,opacity .18s ease;}
-
-/* Damage floats */
 .dmg-float{position:absolute;top:-8px;left:50%;transform:translateX(-50%);
   font-family:'Cinzel',serif;font-weight:600;font-size:.82rem;
   pointer-events:none;animation:floatUp .85s ease forwards;z-index:300;white-space:nowrap;}
@@ -258,26 +199,25 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
 .dmg-float.resist{color:#88aaff;}
 .dmg-float.ult{color:var(--gold2);font-size:1.05rem;}
 .dmg-float.overdrive{color:var(--gold2);}
+.dmg-float.debuff{color:#bb44ff;font-size:.9rem;}
 @keyframes floatUp{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-38px)}}
-
-/* Peek popup */
 .peek{position:fixed;z-index:700;background:var(--surface2);
   border:1px solid rgba(212,168,67,.3);border-radius:12px;padding:10px;
   min-width:190px;max-width:280px;box-shadow:0 12px 36px rgba(0,0,0,.8);
   animation:peekIn .18s ease;max-height:80vh;overflow-y:auto;}
 @keyframes peekIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.peek-title{font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:7px;}
+.peek-title{font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
 .peek-cards{display:flex;flex-wrap:wrap;gap:5px;}
-.peek .hcard{cursor:default;pointer-events:none;}
-
-/* ══ MOBILE LANDSCAPE ══ */
 @media (max-width:900px) and (orientation:landscape){
+  #titleScreen{gap:8px;padding:10px 16px;}
+  .title-logo{font-size:clamp(1.6rem,6vw,2.8rem);}
+  .title-desc{font-size:.7rem;max-width:260px;}
+  .start-btn{padding:9px 28px;font-size:.8rem;}
   .top-bar{padding:3px 8px;gap:5px;}
-  .en-val{font-size:.95rem;}
-  .round-badge{font-size:.74rem;}
-  .commit-btn{padding:4px 10px;font-size:.58rem;}
-  .phase-lbl,.overdrive-banner,.guard-banner{font-size:.36rem;}
+  .round-badge{font-size:.78rem;}
+  .en-val{font-size:.9rem;}
+  .commit-btn{padding:5px 11px;font-size:.6rem;}
+  .phase-lbl,.overdrive-banner,.guard-banner{font-size:.38rem;}
   .fighters-row{padding:3px 4px 2px;gap:3px;flex:0 0 60%;}
   .team-fighters{gap:3px;}
   .f-header{padding:4px 3px 2px;gap:2px;}
@@ -288,11 +228,13 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
   .committed-fan{height:32px;}
   .fan-card{width:22px;height:28px;}
   .fan-ic{font-size:.65rem;}
-  .hand-row{padding:3px 6px;gap:4px;}
   .hcard{width:46px;height:64px;}
   .hcard-ic{font-size:.95rem;}
   .hcard-nm{font-size:.38rem;}
   .hcard-vl{font-size:.48rem;}
+  .peek{max-width:240px;padding:8px;}
+  .result-box{padding:24px 28px;}
+  .res-title{font-size:1.4rem;}
 }
 @media (max-width:680px) and (orientation:landscape){
   .f-avatar{width:22px;height:22px;font-size:.78rem;}
@@ -305,8 +247,65 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
   .fan-ic{font-size:.55rem;}
   .committed-fan{height:28px;}
 }
-
-/* ══ RESULT ══ */
+@media (min-width:1100px){
+  .top-bar{padding:7px 18px;gap:14px;}
+  .en-val{font-size:2rem;}
+  .en-lbl{font-size:1rem;}
+  .round-badge{font-size:1.4rem;}
+  .round-lbl{font-size:.6rem;}
+  .overdrive-banner{font-size:.72rem;padding:4px 12px;}
+  .guard-banner{font-size:.68rem;padding:4px 12px;}
+  .phase-lbl{font-size:.68rem;}
+  .pass-btn{font-size:1rem;padding:9px 20px;border-radius:9px;}
+  .commit-btn{font-size:1rem;padding:9px 24px;border-radius:9px;}
+  .top-divider{height:30px;}
+  .fighters-row{padding:10px 12px 6px;gap:10px;flex:0 0 64%;}
+  .team-fighters{gap:10px;}
+  .team-label{font-size:.6rem;padding:0 4px;}
+  .f-header{padding:10px 8px 6px;gap:6px;}
+  .f-avatar{width:54px;height:54px;font-size:1.8rem;border-radius:10px;}
+  .f-name{font-size:.78rem;max-width:120px;}
+  .role-badge{font-size:.52rem;padding:2px 6px;border-radius:4px;}
+  .f-stats-row{font-size:.65rem;gap:8px;}
+  .hp-bar-track{height:5px;}
+  .hp-lbl{font-size:.65rem;margin-top:3px;}
+  .buff-row{gap:4px;margin-top:4px;}
+  .buff-pip,.guard-pip,.overdrive-pip{font-size:.52rem;padding:2px 5px;}
+  .peek-hint{font-size:.48rem;margin-top:3px;}
+  .committed-fan{height:60px;padding:0 8px 6px;}
+  .fan-card{width:40px;height:52px;border-radius:7px;}
+  .fan-ic{font-size:1.2rem;}
+  .fan-tp{font-size:.42rem;}
+  .fan-order{font-size:.38rem;}
+  .hcard{width:82px;height:112px;border-radius:13px;padding:6px 5px 5px;gap:2px;}
+  .hcard-cost{width:20px;height:20px;font-size:.72rem;top:3px;right:3px;}
+  .hcard-ic{font-size:1.7rem;margin-top:4px;}
+  .hcard-nm{font-size:.66rem;line-height:1.25;}
+  .hcard-tp{font-size:.54rem;}
+  .hcard-vl{font-size:.84rem;}
+  .hcard-ow{font-size:.5rem;}
+  .discard-btn{width:18px;height:18px;font-size:.72rem;}
+  .ultimate-card{border-width:2px;}
+  .peek{min-width:280px;max-width:380px;padding:14px;}
+  .peek-title{font-size:.8rem;margin-bottom:10px;}
+  .result-box{padding:48px 64px;border-radius:24px;}
+  .res-icon{font-size:3.6rem;}
+  .res-title{font-size:2.6rem;}
+  .res-sub{font-size:1.1rem;margin-bottom:28px;}
+  .again-btn{padding:14px 44px;font-size:1.1rem;}
+  .title-logo{font-size:clamp(3.5rem,6vw,6rem);}
+  .title-sub{font-size:1rem;letter-spacing:.3em;}
+  .title-desc{font-size:1.05rem;max-width:520px;}
+  .start-btn{padding:16px 56px;font-size:1.1rem;border-radius:13px;}
+  .title-tag{font-size:.76rem;padding:5px 14px;}
+  .card-detail{width:220px;padding:16px;}
+  .cd-nm{font-size:1rem;}
+  .cd-type{font-size:.65rem;}
+  .cd-vl{font-size:1.3rem;}
+  .cd-desc{font-size:.68rem;}
+  .cd-cost{font-size:.64rem;}
+  .cd-hint{font-size:.56rem;}
+}
 .result-ov{display:none;position:fixed;inset:0;z-index:900;
   background:rgba(0,0,0,.88);backdrop-filter:blur(10px);align-items:center;justify-content:center;}
 .result-ov.show{display:flex;}
@@ -324,55 +323,10 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
   border:none;border-radius:10px;color:#0a0b14;font-family:'Cinzel',serif;
   font-size:.86rem;font-weight:600;cursor:pointer;transition:all .2s;}
 .again-btn:hover{transform:translateY(-2px);}
-
-/* ══ MOBILE LANDSCAPE ══ */
-@media (max-width:900px) and (orientation:landscape){
-  #titleScreen{gap:8px;padding:10px 16px;}
-  .title-logo{font-size:clamp(1.6rem,6vw,2.8rem);}
-  .title-desc{font-size:.7rem;max-width:260px;}
-  .start-btn{padding:9px 28px;font-size:.8rem;}
-  .top-bar{padding:3px 8px;gap:5px;}
-  .round-badge{font-size:.78rem;}
-  .en-val{font-size:.9rem;}
-  .orb{width:5px;height:5px;}
-  .commit-btn{padding:5px 11px;font-size:.6rem;}
-  .phase-lbl,.overdrive-banner,.guard-banner{font-size:.38rem;}
-  .b-left,.b-right{padding:3px 3px 0;}
-  .fighters-zone{gap:4px;}
-  .f-header{padding:4px 5px 3px;gap:4px;}
-  .f-avatar{width:28px;height:28px;font-size:.9rem;}
-  .f-name{font-size:.48rem;max-width:70px;}
-  .f-stats-row{font-size:.38rem;}
-  .hp-lbl{font-size:.38rem;}
-  .committed-fan{height:36px;}
-  .fan-card{width:26px;height:32px;}
-  .fan-ic{font-size:.7rem;}
-  .hand-zone{gap:4px;padding:3px 3px;}
-  .hcard{width:50px;height:70px;}
-  .hcard-ic{font-size:1.05rem;}
-  .hcard-nm{font-size:.4rem;}
-  .hcard-vl{font-size:.52rem;}
-  .peek{max-width:240px;padding:8px;}
-  .result-box{padding:24px 28px;}
-  .res-title{font-size:1.4rem;}
-}
-@media (max-width:680px) and (orientation:landscape){
-  .f-name{max-width:54px;}
-  .f-avatar{width:24px;height:24px;font-size:.8rem;}
-  .hcard{width:44px;height:64px;}
-  .hcard-ic{font-size:.95rem;}
-  .hcard-nm{font-size:.36rem;}
-  .hcard-vl{display:none;}
-  .fan-card{width:22px;height:28px;}
-  .fan-ic{font-size:.6rem;}
-  .committed-fan{height:32px;}
-}
 </style>
 </head>
 <body>
 <div id="projLayer"></div>
-
-<!-- TITLE -->
 <div class="screen active" id="titleScreen">
   <div class="title-logo">WuWa Battle</div>
   <div class="title-sub">Card Combat · Beta</div>
@@ -386,8 +340,6 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
   <button class="start-btn" onclick="startBattle()">⚡ Start Battle</button>
   <div style="font-size:.6rem;color:var(--dim);margin-top:-6px;">Teams randomly assigned · enforced role composition</div>
 </div>
-
-<!-- BATTLE -->
 <div class="screen" id="battleScreen">
   <div class="top-bar">
     <div class="top-bar-left">
@@ -402,11 +354,11 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
       <div class="phase-lbl" id="phaseLbl">Tap cards to commit</div>
     </div>
     <div class="top-bar-right">
+      <button class="pass-btn" id="passBtn" onclick="passRound()">⏭ Pass</button>
       <button class="commit-btn" id="commitBtn" onclick="commitRound()">⚔️ Commit</button>
     </div>
   </div>
   <div class="arena">
-    <!-- ROW 1: all 6 fighters side by side -->
     <div class="fighters-row">
       <div class="team-label">YOU</div>
       <div class="team-fighters" id="playerCol"></div>
@@ -414,14 +366,23 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
       <div class="team-fighters" id="enemyCol"></div>
       <div class="team-label" style="color:var(--red)">FOE</div>
     </div>
-    <!-- ROW 2: hand cards -->
-    <div class="hand-row" id="handZone">
-      <div class="hand-row-lbl">Hand</div>
-    </div>
-  </div>
+    <div class="hand-zone-3col" id="handZone">
+      <div class="hand-col" id="handDps">
+        <div class="hand-col-lbl dps-lbl">⚔️ DPS</div>
+        <div class="hand-col-cards" id="handDpsCards"></div>
+      </div>
+      <div class="hand-col-divider"></div>
+      <div class="hand-col" id="handSub">
+        <div class="hand-col-lbl sub-lbl">🌀 Sub</div>
+        <div class="hand-col-cards" id="handSubCards"></div>
+      </div>
+      <div class="hand-col-divider"></div>
+      <div class="hand-col" id="handSupp">
+        <div class="hand-col-lbl supp-lbl">💚 Supp</div>
+        <div class="hand-col-cards" id="handSuppCards"></div>
+      </div>
+    </div>  </div>
 </div>
-
-<!-- RESULT -->
 <div class="result-ov" id="resultOv">
   <div class="result-box">
     <div class="res-icon" id="resIcon">🏆</div>
@@ -430,29 +391,20 @@ body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;
     <button class="again-btn" onclick="goTitle()">Play Again</button>
   </div>
 </div>
-
-<!-- PEEK -->
 <div class="peek" id="peekEl" style="display:none">
   <div class="peek-title" id="peekTitle"></div>
   <div class="peek-cards" id="peekCards"></div>
 </div>
-
 <script>
-// ══════════════════════════════════════
-// CONSTANTS
-// ══════════════════════════════════════
 const EL_VAR={Spectro:'--Spectro',Havoc:'--Havoc',Aero:'--Aero',Glacio:'--Glacio',Electro:'--Electro',Fusion:'--Fusion',Physical:'--Physical'};
-const RESISTANCE = 0.9; // same element = -10% damage
+const RESISTANCE=0.9;
 
-const ROLE_ST = {
-  dps:    {hp:[300,320], atk:[70,100], def:[30,35]},
-  subdps: {hp:[400,420], atk:[55,80],  def:[50,60]},
-  support:{hp:[500,520], atk:[30,45],  def:[90,100]},
+const ROLE_ST={
+  dps:    {hp:[300,320], atk:[70,80],  def:[30,35]},
+  subdps: {hp:[400,420], atk:[55,65],  def:[50,60]},
+  support:{hp:[500,520], atk:[20,25],  def:[90,100]},
 };
 
-// ══════════════════════════════════════
-// RESONATOR DATA — all with roles
-// ══════════════════════════════════════
 const RESONATORS=[
   {name:"Rover (Spectro)", el:"Spectro", role:"support", emoji:"🌟"},
   {name:"Rover (Havoc)",   el:"Havoc",   role:"dps",     emoji:"💜"},
@@ -502,359 +454,433 @@ const RESONATORS=[
   {name:"Luuk Herssen",    el:"Spectro", role:"dps",     emoji:"🗡️"},
 ];
 
-// ══════════════════════════════════════
-// CARD POOLS — Supports have NO attack cards
-// Cost limits: 1-cost unlimited, 2-cost max 4x, 3-cost max 2x
-// ══════════════════════════════════════
 const CHAR_CARDS={
   "Rover (Spectro)":[
     {n:"Soul Link",    t:"heal",   ic:"🌟",v:55,c:2},
-    {n:"Light Veil",   t:"defend", ic:"🛡️",v:50,c:2},
-    {n:"Resonance",    t:"buff",   ic:"✨",bv:.18,c:1},
+    {n:"Light Veil",   t:"defend", ic:"🛡️",v:85,c:2},
+    {n:"Resonance",    t:"buff",   ic:"✨",bv:.08,c:1},
     {n:"Luminary",     t:"heal",   ic:"💫",v:80,c:3},
-    {n:"Starweave",    t:"defend", ic:"🌟",v:75,c:3,ult:true},
+    {n:"Starweave",    t:"defend", ic:"🌟",v:125,c:3,ult:true},
+    {n:"Void Fracture",t:"debuff",ic:"🌟",dv:0.18,c:2,variety:true},
+    {n:"Astral Mend",t:"heal",ic:"💫",v:50,c:1,variety:true},
   ],
   "Rover (Havoc)":[
     {n:"Void Slash",   t:"attack", ic:"💜",v:62,c:2},
-    {n:"Rend",         t:"attack", ic:"🌑",v:38,c:1},
-    {n:"Dark Wave",    t:"attack", ic:"🌀",v:90,c:3},
-    {n:"Havoc Buff",   t:"buff",   ic:"💢",bv:.2,c:1},
+    {n:"Rend",         t:"attack", ic:"🌑",v:52,c:1},
+    {n:"Dark Wave",    t:"attack", ic:"🌀",v:90,c:2},
+    {n:"Havoc Buff",   t:"buff",   ic:"💢",bv:.08,c:1},
     {n:"Cataclysm",    t:"attack", ic:"💥",v:125,c:3,ult:true},
+    {n:"Entropy Mark",t:"debuff",ic:"💜",dv:0.2,c:2,variety:true},
+    {n:"Dark Veil",t:"defend",ic:"🌑",v:72,c:1,variety:true},
   ],
   "Jiyan":[
     {n:"Gale Cleave",  t:"attack", ic:"🌪️",v:65,c:2},
-    {n:"Wind Rush",    t:"attack", ic:"💨",v:36,c:1},
-    {n:"Storm Break",  t:"attack", ic:"🌊",v:92,c:3},
-    {n:"Tailwind",     t:"buff",   ic:"🎐",bv:.15,c:1},
+    {n:"Wind Rush",    t:"attack", ic:"💨",v:52,c:1},
+    {n:"Storm Break",  t:"attack", ic:"🌊",v:90,c:2},
+    {n:"Tailwind",     t:"buff",   ic:"🎐",bv:.07,c:1},
     {n:"Qingloong",    t:"attack", ic:"🐉",v:128,c:3,ult:true},
+    {n:"Wind Sunder",t:"debuff",ic:"🌪️",dv:0.18,c:2,variety:true},
+    {n:"Gale Guard",t:"defend",ic:"🌊",v:70,c:1,variety:true},
   ],
   "Calcharo":[
     {n:"Wuthering",    t:"attack", ic:"⚡",v:60,c:2},
-    {n:"Resonator",    t:"attack", ic:"🌩️",v:38,c:1},
-    {n:"Deathblade",   t:"attack", ic:"💀",v:90,c:3},
-    {n:"Charge Up",    t:"buff",   ic:"🔋",bv:.2,c:1},
+    {n:"Resonator",    t:"attack", ic:"🌩️",v:50,c:1},
+    {n:"Deathblade",   t:"attack", ic:"💀",v:88,c:2},
+    {n:"Charge Up",    t:"buff",   ic:"🔋",bv:.09,c:1},
     {n:"Soulrend",     t:"attack", ic:"⚡",v:122,c:3,ult:true},
+    {n:"Static Brand",t:"debuff",ic:"⚡",dv:0.2,c:2,variety:true},
+    {n:"Volt Mend",t:"heal",ic:"💚",v:48,c:1,variety:true},
   ],
   "Encore":[
     {n:"Flaming Lamb", t:"attack", ic:"🔥",v:58,c:2},
-    {n:"Wooly Atk",    t:"attack", ic:"🐑",v:33,c:1},
-    {n:"Infernal",     t:"attack", ic:"🌋",v:88,c:3},
-    {n:"Burning Soul", t:"buff",   ic:"♨️",bv:.25,c:2},
+    {n:"Wooly Atk",    t:"attack", ic:"🐑",v:51,c:1},
+    {n:"Infernal",     t:"attack", ic:"🌋",v:85,c:2},
+    {n:"Burning Soul", t:"buff",   ic:"♨️",bv:.10,c:2},
     {n:"Cosmos",       t:"attack", ic:"☄️",v:130,c:3,ult:true},
+    {n:"Kindle",t:"debuff",ic:"🔥",dv:0.18,c:2,variety:true},
+    {n:"Wool Shield",t:"defend",ic:"🐑",v:68,c:1,variety:true},
   ],
   "Jianxin":[
-    {n:"Taichi Fist",  t:"attack", ic:"🌬️",v:48,c:2},
-    {n:"Wind Jab",     t:"attack", ic:"💨",v:30,c:1},
-    {n:"Barrier",      t:"defend", ic:"🛡️",v:60,c:2},
-    {n:"Focus",        t:"buff",   ic:"🧘",bv:.12,c:1},
+    {n:"Taichi Fist",  t:"attack", ic:"🌬️",v:55,c:2},
+    {n:"Wind Jab",     t:"attack", ic:"💨",v:50,c:1},
+    {n:"Barrier",      t:"defend", ic:"🛡️",v:80,c:2},
+    {n:"Focus",        t:"buff",   ic:"🧘",bv:.06,c:1},
     {n:"Abyssal",      t:"attack", ic:"🌀",v:120,c:3,ult:true},
+    {n:"Pressure Point",t:"debuff",ic:"🌬️",dv:0.18,c:2,variety:true},
+    {n:"Aero Mend",t:"heal",ic:"💚",v:48,c:1,variety:true},
   ],
   "Lingyang":[
-    {n:"Lion's Fist",  t:"attack", ic:"❄️",v:55,c:2},
-    {n:"Ice Dash",     t:"attack", ic:"🧊",v:36,c:1},
-    {n:"Blizzard Fist",t:"attack", ic:"🌨️",v:82,c:3},
-    {n:"Frost Guard",  t:"defend", ic:"🛡️",v:44,c:1},
-    {n:"Mythical",     t:"attack", ic:"🦁",v:126,c:3,ult:true},
+    {n:"Lion Fist",    t:"attack", ic:"❄️",v:58,c:2},
+    {n:"Ice Dash",     t:"attack", ic:"🧊",v:51,c:1},
+    {n:"Blizzard",     t:"attack", ic:"🌨️",v:85,c:2},
+    {n:"Frost Guard",  t:"defend", ic:"🛡️",v:76,c:1},
+    {n:"Mythical",     t:"attack", ic:"🦁",v:124,c:3,ult:true},
+    {n:"Glacial Roar",t:"debuff",ic:"❄️",dv:0.2,c:2,variety:true},
+    {n:"Frost Charge",t:"buff",ic:"🦁",bv:0.07,c:1,variety:true},
   ],
   "Verina":[
-    {n:"Heal Bloom",   t:"heal",   ic:"🌿",v:60,c:2},
-    {n:"Petal Toss",   t:"defend", ic:"🌸",v:38,c:1},
-    {n:"Verdant Chain",t:"heal",   ic:"💚",v:88,c:3},
-    {n:"Nature Veil",  t:"buff",   ic:"🌱",bv:.15,c:1},
-    {n:"Arboretum",    t:"heal",   ic:"🌳",v:130,c:3,ult:true},
+    {n:"Heal Bloom",   t:"heal",   ic:"🌿",v:58,c:2},
+    {n:"Petal Toss",   t:"defend", ic:"🌸",v:78,c:1},
+    {n:"Verdant Chain",t:"heal",   ic:"💚",v:82,c:3},
+    {n:"Nature Veil",  t:"buff",   ic:"🌱",bv:.07,c:1},
+    {n:"Arboretum",    t:"heal",   ic:"🌳",v:125,c:3,ult:true},
+    {n:"Root Thorn",t:"attack",ic:"🌸",v:55,c:2,variety:true},
+    {n:"Pollen Haze",t:"debuff",ic:"🌿",dv:0.18,c:2,variety:true},
   ],
   "Aalto":[
-    {n:"Fog Blade",    t:"attack", ic:"🍃",v:50,c:2},
-    {n:"Mist Step",    t:"attack", ic:"💨",v:30,c:1},
-    {n:"Gust Barrage", t:"attack", ic:"🌪️",v:76,c:3},
-    {n:"Smokescreen",  t:"debuff", ic:"🌫️",v:22,c:2},
-    {n:"Mistwalker",   t:"attack", ic:"🌬️",v:120,c:3,ult:true},
+    {n:"Fog Blade",    t:"attack", ic:"🍃",v:52,c:2},
+    {n:"Mist Step",    t:"attack", ic:"💨",v:50,c:1},
+    {n:"Gust Barrage", t:"attack", ic:"🌪️",v:80,c:2},
+    {n:"Smokescreen",  t:"debuff", ic:"🌫️",dv:0.2,c:2},
+    {n:"Mistwalker",   t:"attack", ic:"🌬️",v:121,c:3,ult:true},
+    {n:"Fog Drift",t:"buff",ic:"🍃",bv:0.07,c:1,variety:true},
+    {n:"Mist Veil",t:"defend",ic:"🌫️",v:68,c:1,variety:true},
   ],
   "Baizhi":[
     {n:"Healing Wind", t:"heal",   ic:"🌿",v:55,c:2},
-    {n:"Herb Shield",  t:"defend", ic:"🌱",v:48,c:1},
+    {n:"Herb Shield",  t:"defend", ic:"🌱",v:76,c:1},
     {n:"Verdant Burst",t:"heal",   ic:"💚",v:82,c:3},
-    {n:"Barrier Bloom",t:"defend", ic:"🌳",v:55,c:2},
-    {n:"Eternal Bloom",t:"heal",   ic:"🌸",v:128,c:3,ult:true},
+    {n:"Barrier Bloom",t:"defend", ic:"🌳",v:95,c:2},
+    {n:"Eternal Bloom",t:"heal",   ic:"🌸",v:122,c:3,ult:true},
+    {n:"Herb Boost",t:"buff",ic:"🌿",bv:0.07,c:1,variety:true},
+    {n:"Frost Thorn",t:"attack",ic:"🌱",v:52,c:2,variety:true},
   ],
   "Chixia":[
     {n:"Fire Shot",    t:"attack", ic:"🔫",v:56,c:2},
-    {n:"Quick Draw",   t:"attack", ic:"💥",v:34,c:1},
-    {n:"Inferno Shot", t:"attack", ic:"🔥",v:84,c:3},
-    {n:"Heat Up",      t:"buff",   ic:"♨️",bv:.18,c:1},
-    {n:"Blazing Rain", t:"attack", ic:"🌋",v:122,c:3,ult:true},
+    {n:"Quick Draw",   t:"attack", ic:"💥",v:51,c:1},
+    {n:"Inferno Shot", t:"attack", ic:"🔥",v:84,c:2},
+    {n:"Heat Up",      t:"buff",   ic:"♨️",bv:.08,c:1},
+    {n:"Blazing Rain", t:"attack", ic:"🌋",v:127,c:3,ult:true},
+    {n:"Tracer Round",t:"debuff",ic:"🔫",dv:0.2,c:2,variety:true},
+    {n:"Heat Shield",t:"defend",ic:"♨️",v:68,c:1,variety:true},
   ],
   "Danjin":[
     {n:"Bloody Slash", t:"attack", ic:"🗡️",v:62,c:2},
-    {n:"Quick Slice",  t:"attack", ic:"⚔️",v:36,c:1},
-    {n:"Crimson Tide", t:"debuff", ic:"🩸",v:28,c:2},
-    {n:"Blood Pact",   t:"buff",   ic:"💢",bv:.22,c:2},
-    {n:"Vermillion",   t:"attack", ic:"🔱",v:124,c:3,ult:true},
+    {n:"Quick Slice",  t:"attack", ic:"⚔️",v:51,c:1},
+    {n:"Crimson Tide", t:"debuff", ic:"🩸",dv:0.22,c:2},
+    {n:"Blood Pact",   t:"buff",   ic:"💢",bv:.10,c:2},
+    {n:"Vermillion",   t:"attack", ic:"🔱",v:123,c:3,ult:true},
+    {n:"Blood Bind",t:"defend",ic:"🗡️",v:65,c:1,variety:true},
+    {n:"Crimson Mend",t:"heal",ic:"🩸",v:46,c:1,variety:true},
   ],
   "Mortefi":[
     {n:"Flame Arc",    t:"attack", ic:"🎯",v:54,c:2},
-    {n:"Ember",        t:"attack", ic:"🔥",v:32,c:1},
-    {n:"Ignition",     t:"debuff", ic:"☠️",v:24,c:2},
-    {n:"Overheat",     t:"buff",   ic:"♨️",bv:.2,c:1},
-    {n:"Conflagrate",  t:"attack", ic:"🌋",v:120,c:3,ult:true},
+    {n:"Ember",        t:"attack", ic:"🔥",v:50,c:1},
+    {n:"Ignition",     t:"debuff", ic:"☠️",dv:0.18,c:2},
+    {n:"Overheat",     t:"buff",   ic:"♨️",bv:.09,c:1},
+    {n:"Conflagrate",  t:"attack", ic:"🌋",v:126,c:3,ult:true},
+    {n:"Forge Wall",t:"defend",ic:"🎯",v:65,c:1,variety:true},
+    {n:"Ember Salve",t:"heal",ic:"🔥",v:46,c:1,variety:true},
   ],
   "Sanhua":[
     {n:"Ice Prison",   t:"attack", ic:"🌨️",v:54,c:2},
-    {n:"Cold Snap",    t:"attack", ic:"❄️",v:32,c:1},
-    {n:"Cryo Lock",    t:"debuff", ic:"🔒",v:20,c:2},
-    {n:"Glacial Guard",t:"defend", ic:"🛡️",v:50,c:2},
+    {n:"Cold Snap",    t:"attack", ic:"❄️",v:50,c:1},
+    {n:"Cryo Lock",    t:"debuff", ic:"🔒",dv:0.2,c:2},
+    {n:"Glacial Guard",t:"defend", ic:"🛡️",v:80,c:2},
     {n:"Eternal Frost",t:"attack", ic:"🧊",v:122,c:3,ult:true},
+    {n:"Frost Charge",t:"buff",ic:"🌨️",bv:0.07,c:1,variety:true},
+    {n:"Cryo Mend",t:"heal",ic:"❄️",v:46,c:1,variety:true},
   ],
   "Taoqi":[
-    {n:"Block",        t:"defend", ic:"🛡️",v:68,c:2},
-    {n:"Great Wall",   t:"defend", ic:"🏯",v:90,c:3},
-    {n:"Taunt",        t:"buff",   ic:"📣",bv:.1,c:1},
-    {n:"Iron Heal",    t:"heal",   ic:"💚",v:45,c:1},
+    {n:"Block",        t:"defend", ic:"🛡️",v:90,c:2},
+    {n:"Great Wall",   t:"defend", ic:"🏯",v:110,c:2},
+    {n:"Taunt",        t:"buff",   ic:"📣",bv:.06,c:1},
+    {n:"Iron Heal",    t:"heal",   ic:"💚",v:52,c:1},
     {n:"Unbreakable",  t:"defend", ic:"⛰️",v:130,c:3,ult:true},
+    {n:"Void Slam",t:"attack",ic:"🛡️",v:55,c:2,variety:true},
+    {n:"Havoc Sap",t:"debuff",ic:"📣",dv:0.18,c:2,variety:true},
   ],
   "Yangyang":[
-    {n:"Wind Dance",   t:"attack", ic:"🎐",v:48,c:2},
-    {n:"Feather Slash",t:"attack", ic:"🪶",v:28,c:1},
-    {n:"Sky Rend",     t:"debuff", ic:"🌤️",v:22,c:2},
-    {n:"Gale Step",    t:"buff",   ic:"💨",bv:.15,c:1},
+    {n:"Wind Dance",   t:"attack", ic:"🎐",v:52,c:2},
+    {n:"Feather Slash",t:"attack", ic:"🪶",v:50,c:1},
+    {n:"Sky Rend",     t:"debuff", ic:"🌤️",dv:0.18,c:2},
+    {n:"Gale Step",    t:"buff",   ic:"💨",bv:.07,c:1},
     {n:"Stormwing",    t:"attack", ic:"🌪️",v:120,c:3,ult:true},
+    {n:"Feather Veil",t:"defend",ic:"🪶",v:65,c:1,variety:true},
+    {n:"Wind Mend",t:"heal",ic:"🎐",v:46,c:1,variety:true},
   ],
   "Yuanwu":[
-    {n:"Iron Body",    t:"defend", ic:"🛡️",v:58,c:2},
-    {n:"Thunder Guard",t:"defend", ic:"⚡",v:75,c:2},
-    {n:"Rally",        t:"buff",   ic:"📯",bv:.12,c:1},
-    {n:"Volt Heal",    t:"heal",   ic:"💚",v:40,c:1},
+    {n:"Iron Body",    t:"defend", ic:"🛡️",v:88,c:2},
+    {n:"Thunder Guard",t:"defend", ic:"⚡",v:105,c:2},
+    {n:"Rally",        t:"buff",   ic:"📯",bv:.06,c:1},
+    {n:"Volt Heal",    t:"heal",   ic:"💚",v:50,c:1},
     {n:"Thunderclad",  t:"defend", ic:"⛈️",v:128,c:3,ult:true},
+    {n:"Thunder Jab",t:"attack",ic:"🥊",v:54,c:2,variety:true},
+    {n:"Volt Sap",t:"debuff",ic:"⚡",dv:0.18,c:2,variety:true},
   ],
   "Jinhsi":[
     {n:"Stellar Strike",t:"attack",ic:"💫",v:65,c:2},
-    {n:"Radiance",      t:"attack",ic:"🌟",v:38,c:1},
-    {n:"Blazing Sun",   t:"attack",ic:"☀️",v:96,c:3},
-    {n:"Illuminate",    t:"buff",  ic:"✨",bv:.2,c:1},
-    {n:"Incarnation",   t:"attack",ic:"🌞",v:130,c:3,ult:true},
+    {n:"Radiance",      t:"attack",ic:"🌟",v:52,c:1},
+    {n:"Blazing Sun",   t:"attack",ic:"☀️",v:90,c:2},
+    {n:"Illuminate",    t:"buff",  ic:"✨",bv:.09,c:1},
+    {n:"Incarnation",   t:"attack",ic:"🌞",v:129,c:3,ult:true},
+    {n:"Solar Flare",t:"debuff",ic:"☀️",dv:0.18,c:2,variety:true},
+    {n:"Light Veil",t:"defend",ic:"✨",v:68,c:1,variety:true},
   ],
   "Changli":[
     {n:"Flame Burst",  t:"attack", ic:"🔥",v:58,c:2},
-    {n:"Ember Shot",   t:"attack", ic:"💥",v:34,c:1},
-    {n:"Inferno Wave", t:"debuff", ic:"☠️",v:26,c:2},
-    {n:"Burn Mark",    t:"buff",   ic:"♨️",bv:.18,c:1},
-    {n:"True Sight",   t:"attack", ic:"🌋",v:122,c:3,ult:true},
+    {n:"Ember Shot",   t:"attack", ic:"💥",v:50,c:1},
+    {n:"Inferno Wave", t:"debuff", ic:"☠️",dv:0.22,c:2},
+    {n:"Burn Mark",    t:"buff",   ic:"♨️",bv:.08,c:1},
+    {n:"True Sight",   t:"attack", ic:"🌋",v:125,c:3,ult:true},
+    {n:"Ember Wall",t:"defend",ic:"🔥",v:65,c:1,variety:true},
+    {n:"Flame Salve",t:"heal",ic:"🌋",v:46,c:1,variety:true},
   ],
   "Xiangli Yao":[
     {n:"Thunderclap",  t:"attack", ic:"⚡",v:60,c:2},
-    {n:"Chain Bolt",   t:"attack", ic:"🔗",v:36,c:1},
-    {n:"Judge Strike", t:"attack", ic:"⚖️",v:92,c:3},
-    {n:"Electro Field",t:"buff",   ic:"🌐",bv:.18,c:1},
-    {n:"Verdict",      t:"attack", ic:"⚖️",v:128,c:3,ult:true},
+    {n:"Chain Bolt",   t:"attack", ic:"🔗",v:51,c:1},
+    {n:"Judge Strike", t:"attack", ic:"⚖️",v:88,c:2},
+    {n:"Electro Field",t:"buff",   ic:"🌐",bv:.08,c:1},
+    {n:"Verdict",      t:"attack", ic:"⚖️",v:122,c:3,ult:true},
+    {n:"Judgment Arc",t:"debuff",ic:"⚖️",dv:0.2,c:2,variety:true},
+    {n:"Volt Guard",t:"defend",ic:"🌐",v:68,c:1,variety:true},
   ],
   "Zhezhi":[
     {n:"Brushstroke",  t:"attack", ic:"🧊",v:54,c:2},
-    {n:"Ink Frost",    t:"attack", ic:"❄️",v:32,c:1},
-    {n:"Cryo Canvas",  t:"debuff", ic:"🖼️",v:22,c:2},
-    {n:"Ice Veil",     t:"defend", ic:"🛡️",v:50,c:2},
-    {n:"Masterpiece",  t:"attack", ic:"🎨",v:122,c:3,ult:true},
+    {n:"Ink Frost",    t:"attack", ic:"❄️",v:50,c:1},
+    {n:"Cryo Canvas",  t:"debuff", ic:"🖼️",dv:0.2,c:2},
+    {n:"Ice Veil",     t:"defend", ic:"🛡️",v:80,c:2},
+    {n:"Masterpiece",  t:"attack", ic:"🎨",v:124,c:3,ult:true},
+    {n:"Ink Boost",t:"buff",ic:"🎨",bv:0.07,c:1,variety:true},
+    {n:"Frost Salve",t:"heal",ic:"🖼️",v:46,c:1,variety:true},
   ],
   "Shorekeeper":[
     {n:"Tidal Wave",   t:"heal",   ic:"🌊",v:58,c:2},
-    {n:"Sea Pulse",    t:"defend", ic:"💧",v:50,c:1},
-    {n:"Abyss Call",   t:"buff",   ic:"🌑",bv:.15,c:1},
-    {n:"Barrier Reef", t:"defend", ic:"🛡️",v:72,c:3},
-    {n:"Revelation",   t:"heal",   ic:"🌊",v:128,c:3,ult:true},
+    {n:"Sea Pulse",    t:"defend", ic:"💧",v:78,c:1},
+    {n:"Abyss Call",   t:"buff",   ic:"🌑",bv:.07,c:1},
+    {n:"Barrier Reef", t:"defend", ic:"🛡️",v:105,c:2},
+    {n:"Revelation",   t:"heal",   ic:"🌊",v:120,c:3,ult:true},
+    {n:"Tide Surge",t:"attack",ic:"🌊",v:52,c:2,variety:true},
+    {n:"Deep Sap",t:"debuff",ic:"🌑",dv:0.18,c:2,variety:true},
   ],
   "Youhu":[
-    {n:"Ice Guard",    t:"defend", ic:"🦊",v:60,c:2},
-    {n:"Frost Aura",   t:"buff",   ic:"❄️",bv:.15,c:1},
-    {n:"Cryo Shield",  t:"defend", ic:"🛡️",v:78,c:3},
-    {n:"Tail Whip",    t:"heal",   ic:"💚",v:45,c:1},
-    {n:"Arctic Fox",   t:"defend", ic:"🌨️",v:128,c:3,ult:true},
+    {n:"Ice Guard",    t:"defend", ic:"🦊",v:88,c:2},
+    {n:"Frost Aura",   t:"buff",   ic:"❄️",bv:.07,c:1},
+    {n:"Cryo Shield",  t:"defend", ic:"🛡️",v:105,c:2},
+    {n:"Tail Whip",    t:"heal",   ic:"💚",v:52,c:1},
+    {n:"Arctic Fox",   t:"defend", ic:"🌨️",v:126,c:3,ult:true},
+    {n:"Fox Swipe",t:"attack",ic:"🦊",v:52,c:2,variety:true},
+    {n:"Chill Sap",t:"debuff",ic:"❄️",dv:0.18,c:2,variety:true},
   ],
   "Camellya":[
     {n:"Petal Storm",  t:"attack", ic:"🌸",v:62,c:2},
-    {n:"Vine Lash",    t:"attack", ic:"🌿",v:36,c:1},
-    {n:"Bloom Burst",  t:"attack", ic:"💐",v:92,c:3},
-    {n:"Dark Bloom",   t:"debuff", ic:"☠️",v:22,c:2},
-    {n:"Elegy",        t:"attack", ic:"🌺",v:130,c:3,ult:true},
+    {n:"Vine Lash",    t:"attack", ic:"🌿",v:51,c:1},
+    {n:"Bloom Burst",  t:"attack", ic:"💐",v:88,c:2},
+    {n:"Dark Bloom",   t:"debuff", ic:"☠️",dv:0.22,c:2},
+    {n:"Elegy",        t:"attack", ic:"🌺",v:128,c:3,ult:true},
+    {n:"Dark Bloom",t:"buff",ic:"🌺",bv:0.08,c:1,variety:true},
+    {n:"Petal Veil",t:"defend",ic:"🌸",v:68,c:1,variety:true},
   ],
   "Lumi":[
     {n:"Volt Shot",    t:"attack", ic:"💡",v:52,c:2},
-    {n:"Spark",        t:"attack", ic:"⚡",v:30,c:1},
-    {n:"Surge",        t:"debuff", ic:"🌩️",v:20,c:2},
-    {n:"Amp Up",       t:"buff",   ic:"🔋",bv:.16,c:1},
+    {n:"Spark",        t:"attack", ic:"⚡",v:50,c:1},
+    {n:"Surge",        t:"debuff", ic:"🌩️",dv:0.18,c:2},
+    {n:"Amp Up",       t:"buff",   ic:"🔋",bv:.08,c:1},
     {n:"Overload",     t:"attack", ic:"💥",v:120,c:3,ult:true},
+    {n:"Arc Shield",t:"defend",ic:"💡",v:65,c:1,variety:true},
+    {n:"Volt Salve",t:"heal",ic:"⚡",v:46,c:1,variety:true},
   ],
   "Carlotta":[
     {n:"Ice Bullet",   t:"attack", ic:"🔮",v:58,c:2},
-    {n:"Frost Shot",   t:"attack", ic:"❄️",v:33,c:1},
-    {n:"Crystal Rain", t:"attack", ic:"💎",v:86,c:3},
-    {n:"Chill Aura",   t:"buff",   ic:"🌡️",bv:.18,c:1},
-    {n:"Blizzard",     t:"attack", ic:"🧊",v:128,c:3,ult:true},
+    {n:"Frost Shot",   t:"attack", ic:"❄️",v:50,c:1},
+    {n:"Crystal Rain", t:"attack", ic:"💎",v:85,c:2},
+    {n:"Chill Aura",   t:"buff",   ic:"🌡️",bv:.08,c:1},
+    {n:"Blizzard",     t:"attack", ic:"🧊",v:123,c:3,ult:true},
+    {n:"Permafrost",t:"debuff",ic:"🔮",dv:0.18,c:2,variety:true},
+    {n:"Cryo Guard",t:"defend",ic:"💎",v:68,c:1,variety:true},
   ],
   "Roccia":[
-    {n:"Rock Slam",    t:"attack", ic:"🪨",v:65,c:2},
-    {n:"Pebble Toss",  t:"attack", ic:"💜",v:36,c:1},
-    {n:"Gravity Crash",t:"debuff", ic:"🌑",v:26,c:2},
-    {n:"Stone Wall",   t:"defend", ic:"🛡️",v:58,c:2},
-    {n:"Avalanche",    t:"attack", ic:"🏔️",v:124,c:3,ult:true},
+    {n:"Rock Slam",    t:"attack", ic:"🪨",v:62,c:2},
+    {n:"Pebble Toss",  t:"attack", ic:"💜",v:51,c:1},
+    {n:"Gravity Crash",t:"debuff", ic:"🌑",dv:0.2,c:2},
+    {n:"Stone Wall",   t:"defend", ic:"🛡️",v:82,c:2},
+    {n:"Avalanche",    t:"attack", ic:"🏔️",v:126,c:3,ult:true},
+    {n:"Stone Surge",t:"buff",ic:"🪨",bv:0.07,c:1,variety:true},
+    {n:"Rock Salve",t:"heal",ic:"🏔️",v:46,c:1,variety:true},
   ],
   "Phoebe":[
     {n:"Moonray",      t:"attack", ic:"🌙",v:54,c:2},
-    {n:"Star Dust",    t:"attack", ic:"⭐",v:32,c:1},
-    {n:"Lunar Veil",   t:"debuff", ic:"🌑",v:22,c:2},
-    {n:"Moonveil",     t:"defend", ic:"🛡️",v:44,c:1},
-    {n:"Eclipse",      t:"attack", ic:"🌑",v:122,c:3,ult:true},
+    {n:"Star Dust",    t:"attack", ic:"⭐",v:50,c:1},
+    {n:"Lunar Veil",   t:"debuff", ic:"🌑",dv:0.18,c:2},
+    {n:"Moonveil",     t:"defend", ic:"🛡️",v:76,c:1},
+    {n:"Eclipse",      t:"attack", ic:"🌑",v:121,c:3,ult:true},
+    {n:"Luna Boost",t:"buff",ic:"🌙",bv:0.07,c:1,variety:true},
+    {n:"Star Mend",t:"heal",ic:"⭐",v:46,c:1,variety:true},
   ],
   "Brant":[
-    {n:"Dirge",        t:"heal",   ic:"💀",v:50,c:2},
-    {n:"Soul Guard",   t:"defend", ic:"🛡️",v:55,c:1},
-    {n:"Pale Veil",    t:"defend", ic:"🌫️",v:75,c:3},
-    {n:"Grim Pact",    t:"buff",   ic:"🔱",bv:.15,c:1},
-    {n:"Requiem",      t:"heal",   ic:"🎼",v:126,c:3,ult:true},
+    {n:"Dirge",        t:"heal",   ic:"💀",v:54,c:2},
+    {n:"Soul Guard",   t:"defend", ic:"🛡️",v:78,c:1},
+    {n:"Pale Veil",    t:"defend", ic:"🌫️",v:100,c:2},
+    {n:"Grim Pact",    t:"buff",   ic:"🔱",bv:.07,c:1},
+    {n:"Requiem",      t:"heal",   ic:"🎼",v:124,c:3,ult:true},
+    {n:"Dirge Strike",t:"attack",ic:"💀",v:52,c:2,variety:true},
+    {n:"Pale Sap",t:"debuff",ic:"🎼",dv:0.18,c:2,variety:true},
   ],
   "Cantarella":[
-    {n:"Waltz Shield", t:"defend", ic:"🎭",v:58,c:2},
-    {n:"Masked Step",  t:"heal",   ic:"🎪",v:40,c:1},
-    {n:"Veil",         t:"defend", ic:"🌫️",v:78,c:3},
-    {n:"Venom Pact",   t:"buff",   ic:"☠️",bv:.15,c:1},
-    {n:"Finale",       t:"heal",   ic:"🎇",v:128,c:3,ult:true},
+    {n:"Waltz Shield", t:"defend", ic:"🎭",v:88,c:2},
+    {n:"Masked Step",  t:"heal",   ic:"🎪",v:52,c:1},
+    {n:"Veil",         t:"defend", ic:"🌫️",v:100,c:2},
+    {n:"Venom Pact",   t:"buff",   ic:"☠️",bv:.07,c:1},
+    {n:"Finale",       t:"heal",   ic:"🎇",v:126,c:3,ult:true},
+    {n:"Masked Slash",t:"attack",ic:"🎭",v:52,c:2,variety:true},
+    {n:"Venom Sap",t:"debuff",ic:"☠️",dv:0.18,c:2,variety:true},
   ],
   "Rover (Aero)":[
-    {n:"Wind Guard",   t:"defend", ic:"🌬️",v:55,c:2},
-    {n:"Aero Heal",    t:"heal",   ic:"💨",v:48,c:1},
-    {n:"Sky Barrier",  t:"defend", ic:"🛡️",v:76,c:3},
-    {n:"Gale Buff",    t:"buff",   ic:"🎐",bv:.15,c:1},
-    {n:"Tempest Veil", t:"defend", ic:"🌪️",v:128,c:3,ult:true},
+    {n:"Wind Guard",   t:"defend", ic:"🌬️",v:85,c:2},
+    {n:"Aero Heal",    t:"heal",   ic:"💨",v:52,c:1},
+    {n:"Sky Barrier",  t:"defend", ic:"🛡️",v:105,c:2},
+    {n:"Gale Buff",    t:"buff",   ic:"🎐",bv:.07,c:1},
+    {n:"Tempest Veil", t:"defend", ic:"🌪️",v:130,c:3,ult:true},
+    {n:"Wind Strike",t:"attack",ic:"🌬️",v:52,c:2,variety:true},
+    {n:"Gale Sap",t:"debuff",ic:"🎐",dv:0.18,c:2,variety:true},
   ],
   "Zani":[
     {n:"Spectral Fist",t:"attack", ic:"👊",v:60,c:2},
-    {n:"Ghost Jab",    t:"attack", ic:"👻",v:34,c:1},
-    {n:"Phantom Rush", t:"attack", ic:"💫",v:86,c:3},
-    {n:"Spirit Guard", t:"buff",   ic:"✨",bv:.18,c:1},
-    {n:"Oblivion",     t:"attack", ic:"🌑",v:126,c:3,ult:true},
+    {n:"Ghost Jab",    t:"attack", ic:"👻",v:51,c:1},
+    {n:"Phantom Rush", t:"attack", ic:"💫",v:85,c:2},
+    {n:"Spirit Guard", t:"buff",   ic:"✨",bv:.08,c:1},
+    {n:"Oblivion",     t:"attack", ic:"🌑",v:122,c:3,ult:true},
+    {n:"Void Grasp",t:"debuff",ic:"👻",dv:0.2,c:2,variety:true},
+    {n:"Phase Veil",t:"defend",ic:"💫",v:68,c:1,variety:true},
   ],
   "Ciaccona":[
     {n:"Music Blade",  t:"attack", ic:"🎵",v:52,c:2},
-    {n:"Note Strike",  t:"attack", ic:"🎶",v:30,c:1},
-    {n:"Cadence",      t:"debuff", ic:"🎼",v:22,c:2},
-    {n:"Harmony",      t:"buff",   ic:"🎸",bv:.16,c:1},
+    {n:"Note Strike",  t:"attack", ic:"🎶",v:50,c:1},
+    {n:"Cadence",      t:"debuff", ic:"🎼",dv:0.18,c:2},
+    {n:"Harmony",      t:"buff",   ic:"🎸",bv:.07,c:1},
     {n:"Symphony",     t:"attack", ic:"🎺",v:120,c:3,ult:true},
+    {n:"Note Shield",t:"defend",ic:"🎵",v:65,c:1,variety:true},
+    {n:"Cadence Mend",t:"heal",ic:"🎶",v:46,c:1,variety:true},
   ],
   "Cartethyia":[
     {n:"Petal Slash",  t:"attack", ic:"🌺",v:54,c:2},
-    {n:"Wind Kiss",    t:"attack", ic:"💨",v:30,c:1},
-    {n:"Blossom Storm",t:"attack", ic:"🌸",v:82,c:3},
-    {n:"Gentle Breeze",t:"buff",   ic:"🎐",bv:.15,c:1},
+    {n:"Wind Kiss",    t:"attack", ic:"💨",v:50,c:1},
+    {n:"Blossom Storm",t:"attack", ic:"🌸",v:82,c:2},
+    {n:"Gentle Breeze",t:"buff",   ic:"🎐",bv:.07,c:1},
     {n:"Flowering",    t:"attack", ic:"🌻",v:124,c:3,ult:true},
+    {n:"Petal Gale",t:"debuff",ic:"🌺",dv:0.18,c:2,variety:true},
+    {n:"Bloom Guard",t:"defend",ic:"🌸",v:68,c:1,variety:true},
   ],
   "Lupa":[
-    {n:"Wolf Fang",    t:"attack", ic:"🐺",v:65,c:2},
-    {n:"Pack Howl",    t:"attack", ic:"🌙",v:38,c:1},
-    {n:"Alpha Strike", t:"attack", ic:"⚔️",v:92,c:3},
-    {n:"Fury",         t:"buff",   ic:"🔥",bv:.25,c:2},
+    {n:"Wolf Fang",    t:"attack", ic:"🐺",v:62,c:2},
+    {n:"Pack Howl",    t:"attack", ic:"🌙",v:51,c:1},
+    {n:"Alpha Strike", t:"attack", ic:"⚔️",v:88,c:2},
+    {n:"Fury",         t:"buff",   ic:"🔥",bv:.10,c:2},
     {n:"Bloodlust",    t:"attack", ic:"🩸",v:130,c:3,ult:true},
+    {n:"Fire Fang",t:"debuff",ic:"🐺",dv:0.2,c:2,variety:true},
+    {n:"Pack Guard",t:"defend",ic:"🌙",v:68,c:1,variety:true},
   ],
   "Phrolova":[
     {n:"Dark Talon",   t:"attack", ic:"🦅",v:62,c:2},
-    {n:"Dive",         t:"attack", ic:"💨",v:36,c:1},
-    {n:"Shred",        t:"debuff", ic:"☠️",v:24,c:2},
-    {n:"Predator",     t:"buff",   ic:"🔥",bv:.2,c:1},
-    {n:"Storm Dive",   t:"attack", ic:"🌑",v:128,c:3,ult:true},
+    {n:"Dive",         t:"attack", ic:"💨",v:51,c:1},
+    {n:"Shred",        t:"debuff", ic:"☠️",dv:0.25,c:2},
+    {n:"Predator",     t:"buff",   ic:"🔥",bv:.09,c:1},
+    {n:"Storm Dive",   t:"attack", ic:"🌑",v:125,c:3,ult:true},
+    {n:"Feather Ward",t:"defend",ic:"🦅",v:65,c:1,variety:true},
+    {n:"Talon Mend",t:"heal",ic:"💨",v:46,c:1,variety:true},
   ],
   "Augusta":[
     {n:"Crown Strike", t:"attack", ic:"👑",v:60,c:2},
-    {n:"Zap",          t:"attack", ic:"⚡",v:36,c:1},
-    {n:"Royal Arc",    t:"attack", ic:"🌩️",v:90,c:3},
-    {n:"Sovereign",    t:"buff",   ic:"🏆",bv:.22,c:1},
+    {n:"Zap",          t:"attack", ic:"⚡",v:51,c:1},
+    {n:"Royal Arc",    t:"attack", ic:"🌩️",v:88,c:2},
+    {n:"Sovereign",    t:"buff",   ic:"🏆",bv:.10,c:1},
     {n:"Dominion",     t:"attack", ic:"👑",v:128,c:3,ult:true},
+    {n:"Royal Edict",t:"debuff",ic:"👑",dv:0.2,c:2,variety:true},
+    {n:"Crown Guard",t:"defend",ic:"🏆",v:68,c:1,variety:true},
   ],
   "Iuno":[
-    {n:"Aero Jab",     t:"attack", ic:"🎪",v:50,c:2},
-    {n:"Gust",         t:"attack", ic:"💨",v:28,c:1},
-    {n:"Wind Debuff",  t:"debuff", ic:"🌀",v:20,c:2},
-    {n:"Breeze Buff",  t:"buff",   ic:"🎐",bv:.14,c:1},
+    {n:"Aero Jab",     t:"attack", ic:"🎪",v:52,c:2},
+    {n:"Gust",         t:"attack", ic:"💨",v:50,c:1},
+    {n:"Wind Debuff",  t:"debuff", ic:"🌀",dv:0.18,c:2},
+    {n:"Breeze Buff",  t:"buff",   ic:"🎐",bv:.07,c:1},
     {n:"Cyclone",      t:"attack", ic:"🌪️",v:120,c:3,ult:true},
+    {n:"Gust Shield",t:"defend",ic:"🎪",v:65,c:1,variety:true},
+    {n:"Breeze Mend",t:"heal",ic:"💨",v:46,c:1,variety:true},
   ],
   "Galbrena":[
     {n:"Flame Blade",  t:"attack", ic:"⚔️",v:62,c:2},
-    {n:"Fire Jab",     t:"attack", ic:"🔥",v:36,c:1},
-    {n:"Inferno Cut",  t:"attack", ic:"🌋",v:90,c:3},
-    {n:"War Cry",      t:"buff",   ic:"📯",bv:.22,c:1},
-    {n:"Reckoning",    t:"attack", ic:"⚡",v:128,c:3,ult:true},
+    {n:"Fire Jab",     t:"attack", ic:"🔥",v:51,c:1},
+    {n:"Inferno Cut",  t:"attack", ic:"🌋",v:88,c:2},
+    {n:"War Cry",      t:"buff",   ic:"📯",bv:.10,c:1},
+    {n:"Reckoning",    t:"attack", ic:"⚡",v:127,c:3,ult:true},
+    {n:"War Scar",t:"debuff",ic:"⚔️",dv:0.2,c:2,variety:true},
+    {n:"Flame Guard",t:"defend",ic:"📯",v:68,c:1,variety:true},
   ],
   "Qiuyuan":[
-    {n:"Autumn Blade", t:"attack", ic:"🍂",v:50,c:2},
-    {n:"Leaf Dart",    t:"attack", ic:"🍃",v:28,c:1},
-    {n:"Wind Scar",    t:"debuff", ic:"🌬️",v:20,c:2},
-    {n:"Harvest",      t:"buff",   ic:"🌾",bv:.15,c:1},
-    {n:"Last Leaf",    t:"attack", ic:"🍁",v:120,c:3,ult:true},
+    {n:"Autumn Blade", t:"attack", ic:"🍂",v:52,c:2},
+    {n:"Leaf Dart",    t:"attack", ic:"🍃",v:50,c:1},
+    {n:"Wind Scar",    t:"debuff", ic:"🌬️",dv:0.18,c:2},
+    {n:"Harvest",      t:"buff",   ic:"🌾",bv:.07,c:1},
+    {n:"Last Leaf",    t:"attack", ic:"🍁",v:121,c:3,ult:true},
+    {n:"Leaf Guard",t:"defend",ic:"🍃",v:65,c:1,variety:true},
+    {n:"Harvest Mend",t:"heal",ic:"🍂",v:46,c:1,variety:true},
   ],
   "Chisa":[
-    {n:"Vortex Guard", t:"defend", ic:"🌀",v:60,c:2},
-    {n:"Dark Heal",    t:"heal",   ic:"💜",v:48,c:1},
-    {n:"Abyss Shield", t:"defend", ic:"🛡️",v:80,c:3},
-    {n:"Shadow Buff",  t:"buff",   ic:"🌑",bv:.15,c:1},
-    {n:"Oblivion",     t:"defend", ic:"🌀",v:128,c:3,ult:true},
+    {n:"Vortex Guard", t:"defend", ic:"🌀",v:88,c:2},
+    {n:"Dark Heal",    t:"heal",   ic:"💜",v:52,c:1},
+    {n:"Abyss Shield", t:"defend", ic:"🛡️",v:105,c:2},
+    {n:"Shadow Buff",  t:"buff",   ic:"🌑",bv:.07,c:1},
+    {n:"Abyss",        t:"defend", ic:"🌀",v:128,c:3,ult:true},
+    {n:"Void Slash",t:"attack",ic:"🌀",v:52,c:2,variety:true},
+    {n:"Shadow Sap",t:"debuff",ic:"🌑",dv:0.18,c:2,variety:true},
   ],
   "Buling":[
-    {n:"Static Guard", t:"defend", ic:"⚡",v:55,c:2},
-    {n:"Volt Heal",    t:"heal",   ic:"💚",v:45,c:1},
-    {n:"Surge Shield", t:"defend", ic:"🛡️",v:76,c:3},
-    {n:"Charge Buff",  t:"buff",   ic:"🔋",bv:.14,c:1},
-    {n:"Overcharge",   t:"heal",   ic:"💡",v:126,c:3,ult:true},
+    {n:"Static Guard", t:"defend", ic:"⚡",v:85,c:2},
+    {n:"Volt Heal",    t:"heal",   ic:"💚",v:52,c:1},
+    {n:"Surge Shield", t:"defend", ic:"🛡️",v:105,c:2},
+    {n:"Charge Buff",  t:"buff",   ic:"🔋",bv:.06,c:1},
+    {n:"Overcharge",   t:"heal",   ic:"💡",v:120,c:3,ult:true},
+    {n:"Surge Strike",t:"attack",ic:"⚡",v:52,c:2,variety:true},
+    {n:"Arc Sap",t:"debuff",ic:"🔋",dv:0.18,c:2,variety:true},
   ],
   "Lynae":[
     {n:"Spectro Blade",t:"attack", ic:"🌿",v:52,c:2},
-    {n:"Vine Strike",  t:"attack", ic:"🍃",v:30,c:1},
-    {n:"Root Debuff",  t:"debuff", ic:"🌱",v:22,c:2},
-    {n:"Nature Buff",  t:"buff",   ic:"🌳",bv:.16,c:1},
-    {n:"Overgrowth",   t:"attack", ic:"🌲",v:120,c:3,ult:true},
+    {n:"Vine Strike",  t:"attack", ic:"🍃",v:50,c:1},
+    {n:"Root Debuff",  t:"debuff", ic:"🌱",dv:0.2,c:2},
+    {n:"Nature Buff",  t:"buff",   ic:"🌳",bv:.08,c:1},
+    {n:"Overgrowth",   t:"attack", ic:"🌲",v:122,c:3,ult:true},
+    {n:"Root Veil",t:"defend",ic:"🌱",v:65,c:1,variety:true},
+    {n:"Vine Mend",t:"heal",ic:"🌿",v:46,c:1,variety:true},
   ],
   "Mornye":[
     {n:"Harvest Heal", t:"heal",   ic:"🌾",v:58,c:2},
-    {n:"Crop Shield",  t:"defend", ic:"🛡️",v:50,c:1},
+    {n:"Crop Shield",  t:"defend", ic:"🛡️",v:78,c:1},
     {n:"Abundance",    t:"heal",   ic:"💚",v:82,c:3},
-    {n:"Blessing",     t:"buff",   ic:"✨",bv:.15,c:1},
-    {n:"Bounty",       t:"heal",   ic:"🌟",v:128,c:3,ult:true},
+    {n:"Blessing",     t:"buff",   ic:"✨",bv:.07,c:1},
+    {n:"Bounty",       t:"heal",   ic:"🌟",v:123,c:3,ult:true},
+    {n:"Harvest Strike",t:"attack",ic:"🌾",v:52,c:2,variety:true},
+    {n:"Ember Sap",t:"debuff",ic:"🌟",dv:0.18,c:2,variety:true},
   ],
   "Aemeath":[
     {n:"Flame Cross",  t:"attack", ic:"🔱",v:62,c:2},
-    {n:"Sacred Fire",  t:"attack", ic:"🔥",v:36,c:1},
-    {n:"Holy Blaze",   t:"attack", ic:"✝️",v:92,c:3},
-    {n:"Devotion",     t:"buff",   ic:"✨",bv:.22,c:1},
-    {n:"Revelation",   t:"attack", ic:"🌟",v:128,c:3,ult:true},
+    {n:"Sacred Fire",  t:"attack", ic:"🔥",v:51,c:1},
+    {n:"Holy Blaze",   t:"attack", ic:"✝️",v:88,c:2},
+    {n:"Devotion",     t:"buff",   ic:"✨",bv:.10,c:1},
+    {n:"Revelation",   t:"attack", ic:"🌟",v:120,c:3,ult:true},
+    {n:"Sacred Sear",t:"debuff",ic:"🔱",dv:0.2,c:2,variety:true},
+    {n:"Holy Veil",t:"defend",ic:"✝️",v:68,c:1,variety:true},
   ],
   "Luuk Herssen":[
     {n:"Spectro Blade",t:"attack", ic:"🗡️",v:62,c:2},
-    {n:"Quick Slash",  t:"attack", ic:"⚡",v:36,c:1},
-    {n:"Void Edge",    t:"attack", ic:"💫",v:90,c:3},
-    {n:"Battle Cry",   t:"buff",   ic:"📯",bv:.2,c:1},
-    {n:"Annihilation", t:"attack", ic:"💥",v:128,c:3,ult:true},
+    {n:"Quick Slash",  t:"attack", ic:"⚡",v:51,c:1},
+    {n:"Void Edge",    t:"attack", ic:"💫",v:88,c:2},
+    {n:"Battle Cry",   t:"buff",   ic:"📯",bv:.09,c:1},
+    {n:"Annihilation", t:"attack", ic:"💥",v:129,c:3,ult:true},
+    {n:"Void Rend",t:"debuff",ic:"💫",dv:0.2,c:2,variety:true},
+    {n:"Edge Guard",t:"defend",ic:"🗡️",v:68,c:1,variety:true},
   ],
 };
 
-// ══════════════════════════════════════
-// STATE
-// ══════════════════════════════════════
 let G={};
 function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
 function pick(a){return a[Math.floor(Math.random()*a.length)];}
 function shuf(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
 
-// ═══════════════════════════════════════
-// FIX 1: ENFORCED TEAM COMPOSITION
-// Each team must have exactly 1 DPS, 1 Sub-DPS, 1 Support
-// ═══════════════════════════════════════
 function pickBalancedTeam(pool){
-  const byRole={dps:[],subdps:[],support:[]};
-  pool.forEach(r=>{
-    const role=normRole(r.role);
-    if(byRole[role]) byRole[role].push(r);
-  });
-  const dps   = pick(shuf(byRole.dps));
-  const subdps = pick(shuf(byRole.subdps));
-  const supp  = pick(shuf(byRole.support));
-  return [dps, subdps, supp];
+  const by={dps:[],subdps:[],support:[]};
+  pool.forEach(r=>{const role=normRole(r.role);if(by[role])by[role].push(r);});
+  return[pick(shuf(by.dps)),pick(shuf(by.subdps)),pick(shuf(by.support))];
 }
-
 function normRole(r){
   const s=(r||'').toLowerCase().trim();
   if(s==='sub'||s==='subdps'||s==='sub-dps') return 'subdps';
@@ -862,203 +888,125 @@ function normRole(r){
   return 'dps';
 }
 
-function makeFighter(c){
-  const role=normRole(c.role||'dps');
-  const rs=ROLE_ST[role];
-  const maxHp=rnd(...rs.hp), atk=rnd(...rs.atk), def=rnd(...rs.def);
-  // Build a card pool respecting cost limits: 1-cost unlimited, 2-cost max 4, 3-cost max 2
-  const rawPool = CHAR_CARDS[c.name] || CHAR_CARDS["Jiyan"];
-  const cardPool = buildLimitedPool(rawPool);
-  return{...c, role, maxHp, hp:maxHp, atk, def,
-    shield:0, atkMult:1, buffRounds:0, alive:true,
-    overdrive:false, guard:false,
-    id:'f'+Math.random().toString(36).slice(2),
-    cardPool,
-    committed:[],
-  };
-}
-
-// ═══════════════════════════════════════
-// FIX 4: CARD POOL COST LIMITS
-// 1-cost: unlimited | 2-cost: max 4 | 3-cost: max 2
-// ═══════════════════════════════════════
-function buildLimitedPool(rawPool){
-  // Filter supports: no attack cards
-  // Also enforce cost limits in the hand draw, not in pool itself
-  // Pool stays as-is, limits applied at draw time
-  return rawPool;
-}
-
-// Builds a drawable hand respecting cost limits
-function buildHandFromPool(pool, role){
-  const hand=[];
-  let count2=0, count3=0;
-  // shuffle and build respecting limits
-  const shuffled=shuf([...pool]);
-  // Always include all 1-cost (unlimited)
-  shuffled.forEach(c=>{
-    if(c.c===1) hand.push({...c});
-    else if(c.c===2 && count2<4){hand.push({...c}); count2++;}
-    else if(c.c===3 && count3<2){hand.push({...c}); count3++;}
+function buildLimitedHand(pool){
+  const hand=[];let c2=0,c3=0;
+  shuf([...pool]).forEach(c=>{
+    if(c.c<=1)hand.push({...c});
+    else if(c.c===2&&c2<4){hand.push({...c});c2++;}
+    else if(c.c===3&&c3<2){hand.push({...c});c3++;}
   });
   return hand;
 }
 
-// ═══════════════════════════════════════
-// FIX 2: FIRST TURN ENERGY BALANCE
-// Attacker order determined by DEF; player DEF sum vs enemy DEF sum
-// First (lower DEF total) → starts 2 energy
-// Second (higher DEF total, Guard buff) → starts 4 energy + Guard
-// ═══════════════════════════════════════
-function calcFirstTurnOrder(){
-  const playerDef = G.player.reduce((s,f)=>s+f.def,0);
-  const enemyDef  = G.enemy.reduce((s,f)=>s+f.def,0);
-  // Higher DEF team goes first in RESOLVE (per GDD), but for energy:
-  // First ATTACKER = lowest DEF (acts first in commit, less DEF = squishier)
-  // We'll say: player is always the "first committer" for simplicity
-  // Energy: player starts with 2 if they have lower total DEF (attacks first)
-  //         player starts with 4 + Guard if higher total DEF (attacks second)
-  if(playerDef <= enemyDef){
-    // Player goes first: 2 energy, no guard
-    G.energy = 2;
-    G.playerGoesFirst = true;
+function makeFighter(c){
+  const role=normRole(c.role||'dps');
+  const rs=ROLE_ST[role];
+  const maxHp=rnd(...rs.hp),atk=rnd(...rs.atk),def=rnd(...rs.def);
+  return{...c,role,maxHp,hp:maxHp,atk,def,
+    shield:0,atkMult:1,buffRounds:0,debuffRounds:0,atkDebuffAmount:0,alive:true,overdrive:false,guard:false,
+    id:'f'+Math.random().toString(36).slice(2),
+    cardPool:CHAR_CARDS[c.name]||CHAR_CARDS["Jiyan"],
+    committed:[]};
+}
+
+function calcFirstTurn(){
+  const pd=G.player.reduce((s,f)=>s+f.def,0);
+  const ed=G.enemy.reduce((s,f)=>s+f.def,0);
+  if(pd<=ed){
+    G.energy=2; G.botEnergy=3;
+    G.enemy.forEach(f=>f.guard=true);
   } else {
-    // Player goes second: 4 energy + Guard (DEF treated as highest stat T1)
-    G.energy = 4;
-    G.playerGoesFirst = false;
+    G.energy=3;
     G.player.forEach(f=>f.guard=true);
+    G.botEnergy=2;
   }
+  G.startEnergy=G.energy;
+  G.botStartEnergy=G.botEnergy;
 }
 
 function startBattle(){
-  const all = shuf([...RESONATORS]);
-  // FIX 1: Pick balanced teams (1 DPS + 1 SubDPS + 1 Support each)
-  // Use two separate shuffled pools to avoid overlap
-  const playerTeam = pickBalancedTeam(all);
-  const usedNames  = new Set(playerTeam.map(r=>r.name));
-  const remaining  = all.filter(r=>!usedNames.has(r.name));
-  const enemyTeam  = pickBalancedTeam(remaining);
-
-  G={
-    player: playerTeam.map(makeFighter),
-    enemy:  enemyTeam.map(makeFighter),
-    energy:10, maxE:10,
-    round:1,
-    phase:'commit',
-    hand:[],
-    done:false,
-    playerGoesFirst:true,
-    isRound1:true,
-  };
-
-  // FIX 2: Apply first-turn energy balance
-  calcFirstTurnOrder();
-
-  // Draw initial hands using cost-limited pools
-  G.player.forEach(f=>{
-    const limitedHand = buildHandFromPool(f.cardPool, f.role);
-    limitedHand.slice(0,2).forEach(c=>
-      G.hand.push({...c, ownerId:f.id, ownerName:f.name, hid:'h'+Math.random().toString(36).slice(2)})
-    );
-  });
-
+  const all=shuf([...RESONATORS]);
+  const pt=pickBalancedTeam(all);
+  const used=new Set(pt.map(r=>r.name));
+  const et=pickBalancedTeam(all.filter(r=>!used.has(r.name)));
+  G={player:pt.map(makeFighter),enemy:et.map(makeFighter),
+    energy:10,maxE:10,botEnergy:0,round:1,phase:'commit',hand:[],done:false,_passing:false};
+  calcFirstTurn();
+  G.player.forEach(f=>buildLimitedHand(f.cardPool).slice(0,2).forEach(c=>{
+    if(G.hand.length>=14)return;
+    if(c.ult && G.hand.some(h=>h.ownerId===f.id&&h.ult)) return;
+    if(c.variety && G.hand.some(h=>h.ownerId===f.id&&h.variety&&h.n===c.n)) return;
+    G.hand.push({...c,ownerId:f.id,ownerName:f.name,hid:'h'+Math.random().toString(36).slice(2)});
+  }));
   showScreen('battleScreen');
   renderAll();
 }
 
-function drawForFighter(f, n=1){
-  const limited = buildHandFromPool(f.cardPool, f.role);
-  shuf(limited).slice(0,n).forEach(c=>
-    G.hand.push({...c, ownerId:f.id, ownerName:f.name, hid:'h'+Math.random().toString(36).slice(2)})
-  );
+function drawForFighter(f,n=1){
+  if(G.hand.length>=14)return;
+  shuf(buildLimitedHand(f.cardPool)).slice(0,n).forEach(c=>{
+    if(G.hand.length>=14)return;
+    if(c.ult && G.hand.some(h=>h.ownerId===f.id&&h.ult)) return;
+    if(c.variety && G.hand.some(h=>h.ownerId===f.id&&h.variety&&h.n===c.n)) return;
+    G.hand.push({...c,ownerId:f.id,ownerName:f.name,hid:'h'+Math.random().toString(36).slice(2)});
+  });
 }
 
-// ══════════════════════════════════════
-// RENDER
-// ══════════════════════════════════════
 function elC(el){return `var(${EL_VAR[el]||'--Physical'})`;}
 function hpColor(pct){return pct>50?'var(--green)':pct>25?'var(--gold)':'var(--red)';}
 function typeCol(t){return t==='attack'?'#ff6060':t==='heal'?'#2ecc71':t==='defend'?'#60a0ff':t==='buff'?'var(--gold)':t==='debuff'?'#bb44ff':'var(--dim2)';}
-
-// Returns a short human-readable targeting description for a card
-function cardDesc(c, role){
+function cardDesc(c,role){
   switch(c.t){
-    case 'attack':
-      return c.ult ? '→ All enemies' : '→ Lowest HP enemy';
-    case 'debuff':
-      return role==='subdps' ? '→ Highest ATK enemy' : '→ Lowest HP enemy';
-    case 'heal':
-      return '→ 70% lowest HP ally\n30% self';
-    case 'defend':
-      return '→ Shield self\n(scales w/ DEF)';
-    case 'buff':
-      return role==='support'
-        ? '→ 70% top DPS\n30% self'
-        : '→ Self ATK +1 round';
+    case 'attack': return c.ult?'→ Lowest HP enemy (ULT)':'→ Random enemy (HP/ATK/DEF)';
+    case 'debuff': return `→ Reduces target ATK by ${Math.round((c.dv||0.20)*100)}% for 1 round\n${role==='subdps'?'Targets highest ATK enemy':'Targets random enemy'}`;
+    case 'heal':   return '→ 70% lowest HP ally\n30% self';
+    case 'defend': return '→ Shield self (scales w/ DEF)\nExpires next round';
+    case 'buff':   return role==='support'?'→ 70% top DPS\n30% self':'→ Self ATK +1 round';
     default: return '';
   }
 }
 
-function renderFighter(f, isPlayer){
-  const pct = Math.max(0, f.hp/f.maxHp*100);
-  const boxCol = elC(f.el);
-  const isOD = f.overdrive ? ' overdrive' : '';
-
-  let pips = '';
-  if(f.buffRounds>0) pips+=`<span class="buff-pip">⬆️×${f.atkMult.toFixed(1)}(${f.buffRounds}r)</span>`;
-  if(f.guard)        pips+=`<span class="guard-pip">🛡️Grd</span>`;
-  if(f.overdrive)    pips+=`<span class="overdrive-pip">⚡OD</span>`;
-  const buffHtml = pips ? `<div class="buff-row">${pips}</div>` : '';
-
-  const hpBarColor = pct>50 ? 'var(--green)' : pct>25 ? 'var(--gold)' : 'var(--red)';
-
-  const header = `
-    <div class="f-header" onclick="showPeek('${f.id}',event)">
-      <div class="f-avatar" style="background:${boxCol}20;border:2px solid ${boxCol}55">${f.emoji}</div>
-      <div class="f-body">
-        <div class="f-top">
-          <span class="f-name" style="color:${boxCol}">${f.name}</span>
-          <span class="role-badge role-${f.role}">${f.role==='subdps'?'Sub':f.role==='support'?'Supp':f.role.toUpperCase()}</span>
-        </div>
-        <div class="f-stats-row"><span>ATK <b>${f.atk}</b></span><span>DEF <b>${f.def}</b></span>${f.shield>0?`<span>🛡️<b>${f.shield}</b></span>`:''}</div>
-        <div class="hp-bar-wrap">
-          <div class="hp-bar-track"><div class="hp-bar-fill" style="width:${pct}%;background:${hpBarColor}"></div></div>
-          <div class="hp-lbl" style="color:${hpBarColor}">${Math.max(0,f.hp)}/${f.maxHp}</div>
-        </div>
-        ${buffHtml}
-        <div class="peek-hint">👁 tap to peek</div>
+function renderFighter(f,isPlayer){
+  const pct=Math.max(0,f.hp/f.maxHp*100);
+  const boxCol=elC(f.el);
+  const hpBarColor=pct>50?'var(--green)':pct>25?'var(--gold)':'var(--red)';
+  let pips='';
+  if(f.buffRounds>0)pips+=`<span class="buff-pip">⬆️×${f.atkMult.toFixed(1)}(${f.buffRounds}r)</span>`;
+  if(f.debuffRounds>0)pips+=`<span class="guard-pip" style="background:rgba(187,68,255,.15);color:#bb44ff;border-color:rgba(187,68,255,.3)">⬇️ATK(${f.debuffRounds}r)</span>`;
+  if(f.guard)pips+=`<span class="guard-pip">🛡️Grd</span>`;
+  if(f.overdrive)pips+=`<span class="overdrive-pip">⚡OD</span>`;
+  if(f.shield>0)pips+=`<span class="guard-pip">🛡️${f.shield}</span>`;
+  const header=`<div class="f-header" onclick="showPeek('${f.id}',event)">
+    <div class="f-avatar" style="background:${boxCol}20;border:2px solid ${boxCol}55">${f.emoji}</div>
+    <div class="f-body">
+      <div class="f-top">
+        <span class="f-name" style="color:${boxCol}">${f.name}</span>
+        <span class="role-badge role-${f.role}">${f.role==='subdps'?'Sub':f.role==='support'?'Supp':f.role.toUpperCase()}</span>
       </div>
-    </div>`;
-
-  if(!isPlayer){
-    return`<div class="fighter enemy-fighter${f.alive?'':' dead'}${isOD}" id="f-${f.id}" onclick="showPeek('${f.id}',event)">
-      ${header}
-    </div>`;
-  }
-
-  const fanHtml = buildFan(f);
-  return`<div class="fighter${f.alive?'':' dead'}${isOD}" id="f-${f.id}">
+      <div class="f-stats-row"><span>ATK <b>${f.atk}</b></span><span>DEF <b>${f.def}</b></span></div>
+      <div class="hp-bar-wrap">
+        <div class="hp-bar-track"><div class="hp-bar-fill" style="width:${pct}%;background:${hpBarColor}"></div></div>
+        <div class="hp-lbl" style="color:${hpBarColor}">${Math.max(0,f.hp)}/${f.maxHp}</div>
+      </div>
+      ${pips?`<div class="buff-row">${pips}</div>`:''}
+      <div class="peek-hint">👁 tap to peek</div>
+    </div>
+  </div>`;
+  if(!isPlayer)return`<div class="fighter enemy-fighter${f.alive?'':' dead'}${f.overdrive?' overdrive':''}" id="f-${f.id}">${header}</div>`;
+  return`<div class="fighter${f.alive?'':' dead'}${f.overdrive?' overdrive':''}" id="f-${f.id}">
     ${header}
-    <div class="committed-fan" id="fan-${f.id}">${fanHtml}</div>
+    <div class="committed-fan" id="fan-${f.id}">${buildFan(f)}</div>
   </div>`;
 }
 
 function buildFan(f){
-  if(!f.committed.length) return '';
-  const total = f.committed.length;
-  // Cards overlap — each card offset slightly right and rotated
-  // FILA: index 0 = first committed = last executed = at the BACK (lowest z-index)
+  if(!f.committed.length)return'';
+  const total=f.committed.length;
   return f.committed.map((c,i)=>{
-    const tc = typeCol(c.t);
-    const offset = i * 14; // px offset per card
-    const rot = (i - (total-1)/2) * 4; // slight rotation spread
-    const zIdx = i + 1;
-    // execution order label: FILA means first-in = last executed
-    const execOrder = total - i; // first committed card = highest number = last to fire
+    const tc=typeCol(c.t),offset=i*14,rot=(i-(total-1)/2)*4,zIdx=i+1,execOrder=total-i;
     return`<div class="fan-card${c.ult?' ult-fan':''}"
-      style="left:${6 + offset}px;z-index:${zIdx};transform:rotate(${rot}deg);"
-      onclick="unplace('${f.id}',${i})"
-      title="Tap to remove · ${c.n} · executes ${execOrder===1?'last':'#'+execOrder}">
+      style="left:${6+offset}px;z-index:${zIdx};transform:rotate(${rot}deg);"
+      onclick="unplace('${f.id}',${i})" title="Tap to remove · ${c.n}">
       <div class="fan-order">${execOrder}</div>
       <div class="fan-ic">${c.ic}</div>
       <div class="fan-tp" style="color:${tc}">${c.ult?'ULT':c.t.slice(0,3).toUpperCase()}</div>
@@ -1067,42 +1015,48 @@ function buildFan(f){
 }
 
 function renderHandCard(hc){
-  const canUse = G.energy>=hc.c && G.phase==='commit' && !G.done;
-  const tc = typeCol(hc.t);
-  const val = hc.t==='buff' ? `+${Math.round((hc.bv||0)*100)}%ATK`
-    : hc.v ? `${hc.t==='attack'||hc.t==='debuff'?'⚔️':'💚'}${hc.v}` : '';
-  return`<div class="hcard${canUse?'':' hcdis'}${hc.ult?' ultimate-card':''}" id="hc-${hc.hid}"
+  const canUse=G.energy>=hc.c&&G.phase==='commit'&&!G.done;
+  const tc=typeCol(hc.t);
+  const val=hc.t==='buff'?`+${Math.round((hc.bv||0)*100)}%ATK`:hc.t==='debuff'?`⬇️${Math.round((hc.dv||0.20)*100)}%ATK`:hc.v?`${hc.t==='attack'?'⚔️':'💚'}${hc.v}`:'';
+  const typeLabel = hc.ult?'⭐ULT':hc.variety?`✦${hc.t.toUpperCase()}`:hc.t.toUpperCase();
+  return`<div class="hcard${canUse?'':' hcdis'}${hc.ult?' ultimate-card':''}${hc.variety?' variety-card':''}" id="hc-${hc.hid}"
     ontouchstart="hcTouchStart(event,'${hc.hid}')"
     ontouchend="hcTouchEnd(event,'${hc.hid}')"
     ontouchcancel="hcTouchCancel('${hc.hid}')"
     onclick="hcTap('${hc.hid}')">
-    <div class="hcard-cost">${hc.c}</div>
+    <div class="hcard-cost${hc.c===0?' free-cost':''}">${hc.c===0?'F':hc.c}</div>
     <div class="hcard-ic">${hc.ic}</div>
     <div class="hcard-nm">${hc.n}</div>
-    <div class="hcard-tp" style="color:${tc}">${hc.ult?'⭐ULT':hc.t.toUpperCase()}</div>
+    <div class="hcard-tp" style="color:${tc}">${typeLabel}</div>
     <div class="hcard-vl" style="color:${tc}">${val}</div>
-    <div class="hcard-ow" style="color:var(--dim)">${hc.ownerName.split(' ')[0]}</div>
+    <div class="hcard-ow">${hc.ownerName.split(' ')[0]}</div>
+    ${G.phase==='commit'&&!G.done?`<div class="discard-btn" onclick="event.stopPropagation();discardCard('${hc.hid}')" title="Discard">✕</div>`:''}
   </div>`;
 }
 
+function discardCard(hid){
+  if(G.phase!=='commit'||G.done)return;
+  G.hand=G.hand.filter(c=>c.hid!==hid);
+  renderAll();
+}
 function renderAll(){
-  document.getElementById('playerCol').innerHTML = G.player.map(f=>renderFighter(f,true)).join('');
-  document.getElementById('enemyCol').innerHTML  = G.enemy.map(f=>renderFighter(f,false)).join('');
-
-  // Hand row — all player cards
-  const hz = document.getElementById('handZone');
-  hz.innerHTML = '<div class="hand-row-lbl">Hand</div>' + G.hand.map(renderHandCard).join('');
-
-  document.getElementById('roundNum').textContent = G.round;
-  document.getElementById('enVal').textContent = G.energy;
-
-  document.getElementById('overdriveBar').style.display = G.energy>=G.maxE ? 'flex':'none';
-  const hasGuard = G.player.some(f=>f.guard);
-  document.getElementById('guardBar').style.display = (hasGuard&&G.round===1)?'flex':'none';
-
-  const committing = G.phase==='commit';
-  document.getElementById('commitBtn').disabled = !committing||G.done;
-  document.getElementById('phaseLbl').textContent = committing ? 'Tap cards to commit' : 'Resolving...';
+  document.getElementById('playerCol').innerHTML=G.player.map(f=>renderFighter(f,true)).join('');
+  document.getElementById('enemyCol').innerHTML=G.enemy.map(f=>renderFighter(f,false)).join('');
+  // Split hand into 3 columns by owner role
+  const dpsCards=G.hand.filter(hc=>{const f=G.player.find(x=>x.name===hc.ownerName);return f&&f.role==='dps';});
+  const subCards=G.hand.filter(hc=>{const f=G.player.find(x=>x.name===hc.ownerName);return f&&f.role==='subdps';});
+  const suppCards=G.hand.filter(hc=>{const f=G.player.find(x=>x.name===hc.ownerName);return f&&f.role==='support';});
+  document.getElementById('handDpsCards').innerHTML=dpsCards.map(renderHandCard).join('');
+  document.getElementById('handSubCards').innerHTML=subCards.map(renderHandCard).join('');
+  document.getElementById('handSuppCards').innerHTML=suppCards.map(renderHandCard).join('');
+  document.getElementById('roundNum').textContent=G.round;
+  document.getElementById('enVal').textContent=G.energy;
+  document.getElementById('overdriveBar').style.display=(G.startEnergy>=G.maxE)?'flex':'none';
+  document.getElementById('guardBar').style.display=(G.player.some(f=>f.guard)&&G.round===1)?'flex':'none';
+  const c=G.phase==='commit';
+  document.getElementById('commitBtn').disabled=!c||G.done;
+  document.getElementById('passBtn').disabled=!c||G.done;
+  document.getElementById('phaseLbl').textContent=c?'Tap cards to commit':'Resolving...';
 }
 
 function updateFighterDOM(f){
@@ -1113,220 +1067,174 @@ function updateFighterDOM(f){
   el.replaceWith(tmp.firstElementChild);
 }
 
-// ══════════════════════════════════════
-// TAP TO COMMIT + LONG PRESS FOR DETAIL
-// ══════════════════════════════════════
-let lpTimer = null;
-let lpActive = false;
-
-function hcTouchStart(e, hid){
-  lpActive = false;
-  lpTimer = setTimeout(()=>{
-    lpActive = true;
-    showCardDetail(hid, e.touches[0]);
-  }, 450);
+let lpTimer=null,lpActive=false;
+function hcTouchStart(e,hid){
+  lpActive=false;
+  lpTimer=setTimeout(()=>{lpActive=true;showCardDetail(hid,e.touches[0]);},450);
 }
-function hcTouchEnd(e, hid){
+function hcTouchEnd(e,hid){
   clearTimeout(lpTimer);
-  if(!lpActive) hcTap(hid);
-  lpActive = false;
-  hideCardDetail();
+  if(lpActive){
+    hideCardDetail();
+    lpActive=false;
+  } else {
+    hcTap(hid);
+  }
 }
-function hcTouchCancel(hid){
-  clearTimeout(lpTimer);
-  lpActive = false;
-  hideCardDetail();
-}
+function hcTouchCancel(hid){clearTimeout(lpTimer);hideCardDetail();lpActive=false;}
 
 function hcTap(hid){
-  if(G.phase!=='commit'||G.done) return;
-  const hc = G.hand.find(c=>c.hid===hid);
-  if(!hc) return;
-  const f = G.player.find(x=>x.name===hc.ownerName && x.alive);
-  if(!f) return;
-  if(G.energy < hc.c) return;
-  G.energy -= hc.c;
+  if(G.phase!=='commit'||G.done)return;
+  const hc=G.hand.find(c=>c.hid===hid);if(!hc)return;
+  const f=G.player.find(x=>x.name===hc.ownerName&&x.alive);if(!f)return;
+  if(G.energy<hc.c)return;
+  G.energy-=hc.c;
   f.committed.push({...hc});
-  G.hand = G.hand.filter(c=>c.hid!==hid);
+  G.hand=G.hand.filter(c=>c.hid!==hid);
   renderAll();
 }
 
-// Show card detail popup on long press
-function showCardDetail(hid, touch){
-  const hc = G.hand.find(c=>c.hid===hid);
-  if(!hc) return;
-  const f = G.player.find(x=>x.name===hc.ownerName);
-  const tc = typeCol(hc.t);
-  const val = hc.t==='buff' ? `+${Math.round((hc.bv||0)*100)}% ATK`
-    : hc.v ? `${hc.t==='attack'||hc.t==='debuff'?'⚔️ ':'💚 '}${hc.v}` : '';
-  const desc = cardDesc(hc, f?f.role:'dps');
-
-  let d = document.getElementById('cardDetailEl');
-  if(!d){ d=document.createElement('div'); d.id='cardDetailEl'; d.className='card-detail'; document.body.appendChild(d); }
-
-  d.innerHTML=`
-    <span class="cd-ic">${hc.ic}</span>
+function showCardDetail(hid,touch){
+  const hc=G.hand.find(c=>c.hid===hid);if(!hc)return;
+  const f=G.player.find(x=>x.name===hc.ownerName);
+  const tc=typeCol(hc.t);
+  const val=hc.t==='buff'?`+${Math.round((hc.bv||0)*100)}% ATK`:hc.t==='debuff'?`⬇️ ${Math.round((hc.dv||0.20)*100)}% ATK`:hc.v?`${hc.t==='attack'?'⚔️ ':'💚 '}${hc.v}`:'';
+  const desc=cardDesc(hc,f?f.role:'dps');
+  let d=document.getElementById('cardDetailEl');
+  if(!d){d=document.createElement('div');d.id='cardDetailEl';d.className='card-detail';document.body.appendChild(d);}
+  d.innerHTML=`<span class="cd-ic">${hc.ic}</span>
     <div class="cd-nm">${hc.n}</div>
     <div class="cd-type" style="color:${tc}">${hc.ult?'⭐ ULTIMATE':hc.t.toUpperCase()}</div>
     <span class="cd-vl" style="color:${tc}">${val}</span>
     <div class="cd-desc">${desc}</div>
-    <div class="cd-cost">Cost: ${hc.c} energy · Owner: ${hc.ownerName}</div>
-    <div class="cd-hint">release to dismiss</div>
-  `;
-
-  const x = Math.min(touch.clientX - 85, window.innerWidth - 180);
-  const y = Math.max(touch.clientY - 220, 8);
-  d.style.left = x+'px';
-  d.style.top  = y+'px';
-  d.style.display = 'block';
-
-  // Also visually highlight the card
-  const el = document.getElementById('hc-'+hid);
-  if(el) el.classList.add('pressing');
+    <div class="cd-cost">Cost: ${hc.c===0?'FREE':hc.c+' energy'} · ${hc.ownerName}</div>
+    <div class="cd-hint">release to dismiss</div>`;
+  const x=Math.min((touch.clientX||100)-85,window.innerWidth-180);
+  const y=Math.max((touch.clientY||100)-220,8);
+  d.style.left=x+'px';d.style.top=y+'px';d.style.display='block';
+  const el=document.getElementById('hc-'+hid);if(el)el.classList.add('pressing');
 }
-
 function hideCardDetail(){
-  const d = document.getElementById('cardDetailEl');
-  if(d) d.style.display='none';
+  const d=document.getElementById('cardDetailEl');if(d)d.style.display='none';
   document.querySelectorAll('.hcard.pressing').forEach(el=>el.classList.remove('pressing'));
 }
 
-// Desktop: also support mousedown long press
-document.addEventListener('mousedown', e=>{
-  const card = e.target.closest('.hcard');
-  if(!card||card.classList.contains('hcdis')) return;
-  const hid = card.id.replace('hc-','');
-  lpActive = false;
-  lpTimer = setTimeout(()=>{
-    lpActive = true;
-    showCardDetail(hid, e);
-  }, 450);
+document.addEventListener('mousedown',e=>{
+  const card=e.target.closest('.hcard');
+  if(!card||card.classList.contains('hcdis'))return;
+  const hid=card.id.replace('hc-','');
+  lpActive=false;
+  lpTimer=setTimeout(()=>{lpActive=true;showCardDetail(hid,e);},450);
 });
-document.addEventListener('mouseup', e=>{
+document.addEventListener('mouseup',e=>{
   clearTimeout(lpTimer);
-  if(lpActive){ hideCardDetail(); lpActive=false; }
-});
-document.addEventListener('mousemove', e=>{
-  if(lpActive) hideCardDetail();
+  if(lpActive){hideCardDetail();lpActive=false;}
 });
 
 function unplace(fid,idx){
-  if(G.phase!=='commit'||G.done) return;
-  const f=G.player.find(x=>x.id===fid);
-  if(!f) return;
-  const card=f.committed[idx];
-  if(!card) return;
+  if(G.phase!=='commit'||G.done)return;
+  const f=G.player.find(x=>x.id===fid);if(!f)return;
+  const card=f.committed[idx];if(!card)return;
   G.energy+=card.c;
   G.hand.push({...card,hid:'h'+Math.random().toString(36).slice(2)});
   f.committed.splice(idx,1);
   renderAll();
 }
 
-// ══════════════════════════════════════
-// COMBO DETECTION
-// ══════════════════════════════════════
-function detectCombos(playerActs, botActs){
+function detectCombos(playerActs){
   const combos={};
-  const playerActSet=playerActs;
-
-  playerActSet.forEach(act=>{
-    const f=act.fighter;
-    const cards=f.committed;
+  playerActs.forEach(act=>{
+    const f=act.fighter,cards=f.committed;
     const hasAtk=cards.some(c=>c.t==='attack'||c.t==='debuff');
     const hasBuff=cards.some(c=>c.t==='buff');
-    if(hasAtk&&hasBuff){
-      combos[f.id]=(combos[f.id]||1)+0.20;
-      showCombo('⚡ Combo! Buff+Attack +20%');
-    }
+    if(hasAtk&&hasBuff){combos[f.id]=(combos[f.id]||1)+0.20;showCombo('⚡ Combo! Buff+Attack +20%');}
   });
-
-  const playerSupports=playerActSet.filter(a=>a.fighter.role==='support');
-  const playerDPS=playerActSet.filter(a=>a.fighter.role==='dps');
-  const supportHealed=playerSupports.some(a=>a.fighter.committed.some(c=>c.t==='heal'));
-  if(supportHealed&&playerDPS.length){
-    playerDPS.forEach(a=>{combos[a.fighter.id]=(combos[a.fighter.id]||1)+0.10;});
+  const suppActs=playerActs.filter(a=>a.fighter.role==='support');
+  const dpsActs=playerActs.filter(a=>a.fighter.role==='dps');
+  if(suppActs.some(a=>a.fighter.committed.some(c=>c.t==='heal'))&&dpsActs.length){
+    dpsActs.forEach(a=>{combos[a.fighter.id]=(combos[a.fighter.id]||1)+0.10;});
     showCombo('💚 Team Synergy! Support+DPS +10%');
   }
-
-  const subDebuff=playerActSet.filter(a=>a.fighter.role==='subdps'&&a.fighter.committed.some(c=>c.t==='debuff'));
-  if(subDebuff.length&&playerDPS.length){
-    playerDPS.forEach(a=>{combos[a.fighter.id]=(combos[a.fighter.id]||1)+0.25;});
+  const subDebuff=playerActs.filter(a=>a.fighter.role==='subdps'&&a.fighter.committed.some(c=>c.t==='debuff'));
+  if(subDebuff.length&&dpsActs.length){
+    dpsActs.forEach(a=>{combos[a.fighter.id]=(combos[a.fighter.id]||1)+0.25;});
     showCombo('🌀 Chain Combo! SubDPS→DPS +25%');
   }
-
   const elCounts={};
-  playerActSet.forEach(a=>{a.fighter.committed.forEach(()=>{elCounts[a.fighter.el]=(elCounts[a.fighter.el]||0)+1;});});
+  playerActs.forEach(a=>{a.fighter.committed.forEach(()=>{elCounts[a.fighter.el]=(elCounts[a.fighter.el]||0)+1;});});
   if(Object.values(elCounts).some(v=>v>=2)){
-    playerActSet.forEach(a=>{combos[a.fighter.id]=(combos[a.fighter.id]||1)+0.15;});
+    playerActs.forEach(a=>{combos[a.fighter.id]=(combos[a.fighter.id]||1)+0.15;});
     showCombo('🌟 Elemental Resonance! +15% Team DMG');
   }
-
   return combos;
 }
 
 let comboTimeout=null;
 function showCombo(text){
-  if(comboTimeout) clearTimeout(comboTimeout);
-  const old=document.querySelector('.combo-flash');
-  if(old) old.remove();
-  const d=document.createElement('div');
-  d.className='combo-flash';d.textContent=text;
+  if(comboTimeout)clearTimeout(comboTimeout);
+  const old=document.querySelector('.combo-flash');if(old)old.remove();
+  const d=document.createElement('div');d.className='combo-flash';d.textContent=text;
   document.body.appendChild(d);
   comboTimeout=setTimeout(()=>d.remove(),900);
 }
 
-// ══════════════════════════════════════
-// COMMIT & RESOLVE
-// ══════════════════════════════════════
-function commitRound(){
+function passRound(){
   if(G.phase!=='commit'||G.done) return;
-  const committed=G.player.filter(f=>f.alive&&f.committed.length>0);
-  if(!committed.length){
-    const lbl=document.getElementById('phaseLbl');
-    lbl.style.color='var(--red)';setTimeout(()=>lbl.style.color='',800);
-    return;
-  }
-  G.phase='resolve';
-  renderAll();
-
-  // FIX 3: Check Overdrive BEFORE building acts (energy is still at start value before spending)
-  // Overdrive activates if player started this turn at max energy (10)
-  // We track this via G.startEnergy set in newRound / startBattle
-  const playerIsOD = G.startEnergy >= G.maxE;
-  if(playerIsOD){
-    G.player.filter(f=>f.alive).forEach(f=>{
-      f.overdrive=true;
-      floatDmg(f.id,'⚡ OVERDRIVE','overdrive');
+  G.player.forEach(f=>{
+    f.committed.forEach(card=>{
+      G.energy+=card.c;
+      G.hand.push({...card,hid:'h'+Math.random().toString(36).slice(2)});
     });
-  }
+    f.committed=[];
+  });
+  G._passing=true;
+  commitRound();
+}
 
+function commitRound(){
+  if(G.phase!=='commit'||G.done)return;
+  if(!G.player.some(f=>f.alive&&f.committed.length>0)){
+    if(!G._passing){
+      const lbl=document.getElementById('phaseLbl');
+      lbl.style.color='var(--red)';setTimeout(()=>lbl.style.color='',800);
+      return;
+    }
+  }
+  G._passing=false;
+  G.phase='resolve';
+  const playerOD=G.startEnergy>=G.maxE;
+  const botOD=G.botStartEnergy>=G.maxE;
+  if(playerOD)G.player.filter(f=>f.alive).forEach(f=>{f.overdrive=true;floatDmg(f.id,'⚡ OD','overdrive');});
+  if(botOD)   G.enemy.filter(f=>f.alive).forEach(f=>{f.overdrive=true;});
+  // Shields apply only to fighters who committed cards this round
+  applyPassiveShields(G.player.filter(f=>f.alive&&f.committed.length>0));
+  applyPassiveShields(G.enemy.filter(f=>f.alive&&f.committed.length>0));
+  renderAll();
   const playerActs=G.player.filter(f=>f.alive&&f.committed.length>0).map(f=>({fighter:f,side:'player'}));
   const botActs=buildBotActs();
-  const combos=detectCombos(playerActs,botActs);
-
-  // Sort by DEF descending; Guard counts DEF as highest stat for round 1
+  const combos=detectCombos(playerActs);
   const allActs=[...playerActs,...botActs].sort((a,b)=>{
-    const da=a.fighter.guard ? Math.max(a.fighter.def,a.fighter.atk,a.fighter.hp/10) : a.fighter.def;
-    const db=b.fighter.guard ? Math.max(b.fighter.def,b.fighter.atk,b.fighter.hp/10) : b.fighter.def;
+    const da=a.fighter.guard?Math.max(a.fighter.def,a.fighter.atk,a.fighter.hp/10):a.fighter.def;
+    const db=b.fighter.guard?Math.max(b.fighter.def,b.fighter.atk,b.fighter.hp/10):b.fighter.def;
     return db-da;
   });
-
   let delay=300;
   allActs.forEach(act=>{
-    setTimeout(()=>{if(!G.done) executeAct(act,combos);},delay);
+    setTimeout(()=>{if(!G.done)executeAct(act,combos);},delay);
     delay+=act.fighter.committed.length*700+400;
   });
-  setTimeout(()=>{if(!G.done) newRound();},delay+400);
+  setTimeout(()=>{if(!G.done)newRound();},delay+400);
 }
 
 function buildBotActs(){
-  return G.enemy.filter(f=>f.alive).map(f=>{
-    const pool=f.cardPool;
-    let budget=rnd(6,7); // FIX: bot energy capped 6-7
+  const aliveEnemies=G.enemy.filter(f=>f.alive);
+  const perFighter=Math.floor(G.botEnergy/Math.max(1,aliveEnemies.length));
+  return aliveEnemies.map(f=>{
+    let budget=perFighter;
     let cards=[];
-    const botHand=shuf([...pool]);
+    const botHand=shuf([...f.cardPool]);
     for(const c of botHand){
-      if(budget<c.c) continue;
+      if(budget<c.c)continue;
       if(f.role==='support'){
         if(f.hp<f.maxHp*0.5&&(c.t==='defend'||c.t==='heal')){cards.push(c);budget-=c.c;}
         else if(c.t==='buff'||c.t==='heal'||c.t==='defend'){cards.push(c);budget-=c.c;}
@@ -1334,48 +1242,46 @@ function buildBotActs(){
         if(c.t==='attack'||c.t==='debuff'){cards.push(c);budget-=c.c;}
         else if(c.t==='buff'&&!cards.some(x=>x.t==='buff')){cards.push(c);budget-=c.c;}
       }
-      if(budget<=0||cards.length>=3) break;
+      if(budget<=0||cards.length>=3)break;
     }
-    if(!cards.length) cards=[pick(pool)];
+    if(!cards.length&&perFighter>0)cards=[pick(f.cardPool.filter(c=>c.c<=perFighter)||f.cardPool)];
     f.committed=cards;
     return{fighter:f,side:'enemy'};
   });
 }
 
-// ══════════════════════════════════════
-// EXECUTE ACTIONS
-// ══════════════════════════════════════
-function executeAct(act, combos={}){
+// Passive shield on cast — distributed by ATK rank (lowest ATK gets most shield)
+function applyPassiveShields(allies){
+  const alive=allies.filter(a=>a.alive).sort((a,b)=>a.atk-b.atk);
+  const shieldAmts=[80,70,60,40,20,10];
+  alive.forEach((f,i)=>{
+    const sh=shieldAmts[i]||30;
+    f.shield=(f.shield||0)+sh;
+    floatDmg(f.id,`+${sh}🛡️`,'buff');
+    updateFighterDOM(f);
+  });
+}
+function executeAct(act,combos={}){
   const{fighter:f,side}=act;
   const isPlayer=side==='player';
   const allies=isPlayer?G.player:G.enemy;
   const foes=isPlayer?G.enemy:G.player;
   const owner=allies.find(x=>x.id===f.id);
-  if(!owner||!owner.alive) return;
-
+  if(!owner||!owner.alive)return;
   const comboMult=combos[owner.id]||1;
-  // FIX 3: Overdrive stat bonus +10% to ATK
   const odMult=owner.overdrive?1.1:1.0;
-  const cards=[...owner.committed];
-  const buffCards=cards.filter(c=>c.t==='buff');
-  const atkCards=cards.filter(c=>c.t!=='buff');
-
-  [...buffCards,...atkCards].forEach((card,ci)=>{
+  const buffCards=owner.committed.filter(c=>c.t==='buff');
+  const restCards=owner.committed.filter(c=>c.t!=='buff');
+  [...buffCards,...restCards].forEach((card,ci)=>{
     setTimeout(()=>{
-      if(!owner.alive) return;
+      if(!owner.alive)return;
       animF(owner.id,'attacking-anim');
       const aliveFoes=foes.filter(r=>r.alive);
       const aliveAllies=allies.filter(r=>r.alive);
-
-      if(card.t==='attack'||card.t==='debuff'){
-        if(!aliveFoes.length) return;
-        let target;
-        if(owner.role==='subdps'&&card.t==='debuff'){
-          target=aliveFoes.sort((a,b)=>b.atk-a.atk)[0];
-        } else {
-          target=aliveFoes.sort((a,b)=>a.hp-b.hp)[0];
-        }
-        const raw=Math.round(card.v * owner.atkMult * (owner.atk/70) * comboMult * odMult);
+      if(card.t==='attack'){
+        if(!aliveFoes.length)return;
+        const target=pickTarget(aliveFoes,owner.role,card.t);
+        const raw=Math.round(card.v*owner.atkMult*(owner.atk/70)*comboMult*odMult);
         const res=dealDmg(target,raw,owner.el);
         fireProj(owner.id,target.id,owner.el,()=>{
           animF(target.id,'taking-hit');
@@ -1384,100 +1290,95 @@ function executeAct(act, combos={}){
           updateFighterDOM(target);
           checkWin();
         });
+      } else if(card.t==='debuff'){
+        if(!aliveFoes.length)return;
+        const target=pickTarget(aliveFoes,owner.role,card.t);
+        const reduction=Math.round(target.atk*(card.dv||0.20));
+        target.atk=Math.max(1,target.atk-reduction);
+        target.debuffRounds=(target.debuffRounds||0)+1;
+        target.atkDebuffAmount=(target.atkDebuffAmount||0)+reduction;
+        fireProj(owner.id,target.id,owner.el,()=>{
+          animF(target.id,'taking-hit');
+          floatDmg(target.id,`⬇️ATK -${reduction} (${Math.round((card.dv||0.20)*100)}%)`,'debuff');
+          updateFighterDOM(target);
+        });
       } else if(card.t==='defend'){
-        // Overdrive also boosts DEF for shield calc
-        const defStat = owner.overdrive ? Math.round(owner.def * 1.1) : owner.def;
-        const sh=Math.round(card.v*(1+defStat/80));
+        const sh=card.v;
         owner.shield+=sh;
         animF(owner.id,'healing-anim');
         floatDmg(owner.id,`+${sh}🛡️`,'buff');
         updateFighterDOM(owner);
       } else if(card.t==='heal'){
-        // FIX: Supports heal 70% to lowest HP ally, 30% to self
         const healAmt=Math.round(card.v*(1+owner.def/100));
         const lowestAlly=aliveAllies.filter(a=>a.id!==owner.id).sort((a,b)=>(a.hp/a.maxHp)-(b.hp/b.maxHp))[0];
-        const mainHeal=Math.round(healAmt*0.7);
-        const selfHeal=Math.round(healAmt*0.3);
-        if(lowestAlly){
-          lowestAlly.hp=Math.min(lowestAlly.maxHp,lowestAlly.hp+mainHeal);
-          animF(lowestAlly.id,'healing-anim');
-          floatDmg(lowestAlly.id,`+${mainHeal}💚`,'heal');
-          updateFighterDOM(lowestAlly);
-        }
-        owner.hp=Math.min(owner.maxHp,owner.hp+selfHeal);
-        animF(owner.id,'healing-anim');
-        floatDmg(owner.id,`+${selfHeal}💚`,'heal');
-        updateFighterDOM(owner);
+        const mainHeal=Math.round(healAmt*0.7),selfHeal=Math.round(healAmt*0.3);
+        if(lowestAlly){lowestAlly.hp=Math.min(lowestAlly.maxHp,lowestAlly.hp+mainHeal);animF(lowestAlly.id,'healing-anim');floatDmg(lowestAlly.id,`+${mainHeal}💚`,'heal');updateFighterDOM(lowestAlly);}
+        owner.hp=Math.min(owner.maxHp,owner.hp+selfHeal);animF(owner.id,'healing-anim');floatDmg(owner.id,`+${selfHeal}💚`,'heal');updateFighterDOM(owner);
       } else if(card.t==='buff'){
-        // FIX: Support buffs split 70% to highest ATK DPS ally, 30% to self
-        owner.atkMult=Math.min(2.5,(owner.atkMult||1)+(card.bv||.15));
+        owner.atkMult=Math.min(2.5,(owner.atkMult||1)+(card.bv||.08));
         owner.buffRounds=1;
         if(owner.role==='support'){
           const topDPS=aliveAllies.filter(a=>a.id!==owner.id&&a.role==='dps').sort((a,b)=>b.atk-a.atk)[0];
-          if(topDPS){
-            topDPS.atkMult=Math.min(2.5,(topDPS.atkMult||1)+(card.bv||.15)*0.7);
-            topDPS.buffRounds=1;
-            animF(topDPS.id,'healing-anim');
-            floatDmg(topDPS.id,`+${Math.round((card.bv||.15)*70)}%ATK`,'buff');
-            updateFighterDOM(topDPS);
-          }
-          floatDmg(owner.id,`+${Math.round((card.bv||.15)*30)}%ATK`,'buff');
+          if(topDPS){topDPS.atkMult=Math.min(2.5,(topDPS.atkMult||1)+(card.bv||.08)*0.7);topDPS.buffRounds=1;animF(topDPS.id,'healing-anim');floatDmg(topDPS.id,`+${Math.round((card.bv||.08)*70)}%ATK`,'buff');updateFighterDOM(topDPS);}
+          floatDmg(owner.id,`+${Math.round((card.bv||.08)*30)}%ATK`,'buff');
         } else {
-          floatDmg(owner.id,`+${Math.round((card.bv||.15)*100)}%ATK`,'buff');
+          floatDmg(owner.id,`+${Math.round((card.bv||.08)*100)}%ATK`,'buff');
         }
-        animF(owner.id,'healing-anim');
-        updateFighterDOM(owner);
+        animF(owner.id,'healing-anim');updateFighterDOM(owner);
       }
-    }, ci*350);
+    },ci*350);
   });
 }
 
-// FIX 5: Crit — 1.5% chance → +30% damage (not 15% × 1.5)
-function dealDmg(target, raw, atkEl){
+function pickTarget(foes,role,cardType){
+  if(foes.length===1)return foes[0];
+  if(role==='subdps'&&cardType==='debuff')return foes.sort((a,b)=>b.atk-a.atk)[0];
+  const strategies=['lowestHp','highestHp','lowestDef','highestAtk','random'];
+  switch(pick(strategies)){
+    case 'lowestHp':  return [...foes].sort((a,b)=>a.hp-b.hp)[0];
+    case 'highestHp': return [...foes].sort((a,b)=>b.hp-a.hp)[0];
+    case 'lowestDef': return [...foes].sort((a,b)=>a.def-b.def)[0];
+    case 'highestAtk':return [...foes].sort((a,b)=>b.atk-a.atk)[0];
+    default:          return pick(foes);
+  }
+}
+
+function dealDmg(target,raw,atkEl){
   const resist=(atkEl===target.el);
   const resMult=resist?RESISTANCE:1.0;
-  const isCrit=Math.random()<0.015; // 1.5% crit chance
-  const critMult=isCrit?1.3:1.0;   // +30% on crit
+  const isCrit=Math.random()<0.015;
+  const critMult=isCrit?1.3:1.0;
   const defReduction=target.def*0.3;
-  // Guard: first round, DEF acts as highest stat (reduces incoming even more)
   const guardBonus=target.guard?target.def*0.2:0;
-  let dmg=Math.max(1,Math.round(raw*resMult*critMult - defReduction - guardBonus));
+  let dmg=Math.max(1,Math.round(raw*resMult*critMult-defReduction-guardBonus));
   let absorbed=0;
   if(target.shield>0){absorbed=Math.min(target.shield,dmg);target.shield-=absorbed;dmg-=absorbed;}
   target.hp=Math.max(0,target.hp-dmg);
-  if(target.hp<=0) target.alive=false;
+  if(target.hp<=0)target.alive=false;
   return{dmg,isCrit,resist,absorbed};
 }
 
-// ══════════════════════════════════════
-// NEW ROUND
-// ══════════════════════════════════════
 function newRound(){
-  if(G.done) return;
-  // Expire buffs, Guard, Overdrive; clear committed
+  if(G.done)return;
+  // ── Shields RESET to 0 for everyone at round end — they do not carry over ──
   [...G.player,...G.enemy].forEach(f=>{
-    f.committed=[];
-    f.overdrive=false;
-    f.guard=false; // Guard only lasts round 1
-    if(f.buffRounds>0){
-      f.buffRounds--;
-      if(f.buffRounds===0) f.atkMult=1;
-    }
+    f.committed=[];f.overdrive=false;f.guard=false;
+    f.shield=0; // Shields expire at round end
+    if(f.buffRounds>0){f.buffRounds--;if(f.buffRounds===0)f.atkMult=1;}
+    if(f.debuffRounds>0){f.debuffRounds--;if(f.debuffRounds===0){f.atk+=f.atkDebuffAmount||0;f.atkDebuffAmount=0;}}
   });
   G.round++;
-  G.isRound1=false;
-  // FIX 2: Normal energy from round 2 onward: +3 per turn, carry over, cap 10
-  G.energy=Math.min(G.maxE, G.energy+3);
-  G.startEnergy=G.energy; // track for overdrive detection
+  G.energy=Math.min(G.maxE,G.energy+3);
+  G.botEnergy=Math.min(G.maxE,G.botEnergy+3);
+  G.startEnergy=G.energy;
+  G.botStartEnergy=G.botEnergy;
   G.phase='commit';
   G.player.filter(f=>f.alive).forEach(f=>drawForFighter(f,1));
+
   renderAll();
   checkWin();
 }
 
-// ══════════════════════════════════════
-// PROJECTILE
-// ══════════════════════════════════════
 function projHTML(el){
   const shapes={
     Spectro:`<svg width="26" height="26" viewBox="0 0 44 44"><polygon points="22,3 27,16 41,16 30,25 34,39 22,30 10,39 14,25 3,16 17,16" fill="var(--Spectro)"/></svg>`,
@@ -1494,8 +1395,7 @@ function fireProj(fromId,toId,el,onHit){
   const fe=document.getElementById('f-'+fromId),te=document.getElementById('f-'+toId);
   if(!fe||!te){onHit();return;}
   const fr=fe.getBoundingClientRect(),tr=te.getBoundingClientRect();
-  const proj=document.createElement('div');
-  proj.className='proj';proj.innerHTML=projHTML(el);
+  const proj=document.createElement('div');proj.className='proj';proj.innerHTML=projHTML(el);
   proj.style.cssText=`left:${fr.left+fr.width/2}px;top:${fr.top+fr.height/2}px;transform:translate(-50%,-50%)`;
   document.getElementById('projLayer').appendChild(proj);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
@@ -1514,33 +1414,24 @@ function animF(fid,cls){
   el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),500);
 }
 
-// ══════════════════════════════════════
-// PEEK
-// ══════════════════════════════════════
-function showPeek(fid, e){
-  e.stopPropagation();
-  const f = G.player.find(x=>x.id===fid) || G.enemy.find(x=>x.id===fid);
-  if(!f) return;
-  const isPlayer = G.player.some(x=>x.id===fid);
-  const peek = document.getElementById('peekEl');
-  document.getElementById('peekTitle').textContent = isPlayer
-    ? `${f.emoji} ${f.name} · Your Cards`
-    : `${f.emoji} ${f.name} · Enemy Cards`;
-
-  document.getElementById('peekCards').innerHTML = f.cardPool.map(c=>{
-    const tc = typeCol(c.t);
-    const val = c.t==='buff' ? `+${Math.round((c.bv||0)*100)}%ATK`
-      : c.v ? `${c.t==='attack'||c.t==='debuff'?'⚔️':'💚'}${c.v}` : '';
-    const desc = cardDesc(c, f.role);
+function showPeek(fid,e){
+  if(e)e.stopPropagation();
+  const f=G.player.find(x=>x.id===fid)||G.enemy.find(x=>x.id===fid);if(!f)return;
+  const isPlayer=G.player.some(x=>x.id===fid);
+  document.getElementById('peekTitle').textContent=`${f.emoji} ${f.name} · ${isPlayer?'Your':'Enemy'} Cards`;
+  document.getElementById('peekCards').innerHTML=f.cardPool.map(c=>{
+    const tc=typeCol(c.t);
+    const val=c.t==='buff'?`+${Math.round((c.bv||0)*100)}%ATK`:c.t==='debuff'?`⬇️${Math.round((c.dv||0.20)*100)}%ATK`:c.v?`${c.t==='attack'?'⚔️':'💚'}${c.v}`:'';
+    const desc=cardDesc(c,f.role);
     let badge='';
     if(isPlayer){
-      const inHand = G.hand.some(h=>h.ownerName===f.name&&h.n===c.n);
-      const committed = f.committed.some(h=>h.n===c.n);
-      if(committed) badge=`<div style="font-size:.34rem;color:var(--gold);font-weight:700">✓ QUEUED</div>`;
-      else if(inHand) badge=`<div style="font-size:.34rem;color:var(--green)">in hand</div>`;
+      const committed=f.committed.some(h=>h.n===c.n);
+      const inHand=G.hand.some(h=>h.ownerName===f.name&&h.n===c.n);
+      if(committed)badge=`<div style="font-size:.34rem;color:var(--gold);font-weight:700">✓ QUEUED</div>`;
+      else if(inHand)badge=`<div style="font-size:.34rem;color:var(--green)">in hand</div>`;
     }
     return`<div class="hcard" style="cursor:default;pointer-events:none;height:100px${c.ult?';border-color:rgba(212,168,67,.5)':''}">
-      <div class="hcard-cost">${c.c}</div>
+      <div class="hcard-cost${c.c===0?' free-cost':''}">${c.c===0?'F':c.c}</div>
       <div class="hcard-ic">${c.ic}</div>
       <div class="hcard-nm">${c.n}</div>
       <div class="hcard-tp" style="color:${tc}">${c.ult?'⭐ULT':c.t.toUpperCase()}</div>
@@ -1549,21 +1440,20 @@ function showPeek(fid, e){
       ${badge}
     </div>`;
   }).join('');
-
-  const x = Math.min((e.clientX||e.touches?.[0]?.clientX||100)+4, window.innerWidth-310);
-  const y = Math.min((e.clientY||e.touches?.[0]?.clientY||100)+4, window.innerHeight-300);
-  peek.style.left=x+'px'; peek.style.top=y+'px'; peek.style.display='block';
+  const cx=e?(e.clientX||e.touches?.[0]?.clientX||100):100;
+  const cy=e?(e.clientY||e.touches?.[0]?.clientY||100):100;
+  const x=Math.min(cx+4,window.innerWidth-310);
+  const y=Math.min(cy+4,window.innerHeight-300);
+  const peek=document.getElementById('peekEl');
+  peek.style.left=x+'px';peek.style.top=y+'px';peek.style.display='block';
 }
 document.addEventListener('click',e=>{
-  if(!e.target.closest('#peekEl') && !e.target.closest('.f-header') && !e.target.closest('.enemy-fighter'))
+  if(!e.target.closest('#peekEl')&&!e.target.closest('.f-header')&&!e.target.closest('.enemy-fighter'))
     document.getElementById('peekEl').style.display='none';
 });
 
-// ══════════════════════════════════════
-// WIN / RESULT
-// ══════════════════════════════════════
 function checkWin(){
-  if(G.done) return;
+  if(G.done)return;
   const pa=G.player.filter(f=>f.alive).length;
   const ea=G.enemy.filter(f=>f.alive).length;
   if(!ea){G.done=true;setTimeout(()=>showResult(true),600);}
@@ -1573,13 +1463,11 @@ function showResult(won){
   document.getElementById('resIcon').textContent=won?'🏆':'💀';
   document.getElementById('resTitle').textContent=won?'Victory!':'Defeated...';
   document.getElementById('resTitle').className='res-title '+(won?'win':'lose');
-  document.getElementById('resSub').textContent=won
-    ?`All enemies defeated in ${G.round} rounds!`
-    :`Your team fell on round ${G.round}.`;
+  document.getElementById('resSub').textContent=won?`All enemies defeated in ${G.round} rounds!`:`Your team fell on round ${G.round}.`;
   document.getElementById('resultOv').classList.add('show');
 }
 function goTitle(){document.getElementById('resultOv').classList.remove('show');document.getElementById('peekEl').style.display='none';showScreen('titleScreen');}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 </script>
 </body>
-  </html>
+</html>
