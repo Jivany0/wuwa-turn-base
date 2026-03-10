@@ -2408,41 +2408,72 @@ function reactionKey(els){
 }
 
 function detectReactions(playerActs,botActs){
-  // Collect elements from fighters that committed a variety card
-  const playerVarEls=playerActs
-    .filter(a=>a.fighter.committed.some(c=>c.variety))
-    .map(a=>a.fighter.el);
-  const botVarEls=botActs
-    .filter(a=>a.fighter.committed.some(c=>c.variety))
-    .map(a=>a.fighter.el);
-  const allVarEls=[...new Set([...playerVarEls,...botVarEls])];
-
-  if(allVarEls.length<2)return;
-
   const player=G.player.filter(f=>f.alive);
   const enemy=G.enemy.filter(f=>f.alive);
 
-  // Check 3-element first (priority)
-  if(allVarEls.length>=3){
-    for(let i=0;i<allVarEls.length-2;i++)
-      for(let j=i+1;j<allVarEls.length-1;j++)
-        for(let k=j+1;k<allVarEls.length;k++){
-          const key=reactionKey([allVarEls[i],allVarEls[j],allVarEls[k]]);
+  // ── Player reactions: only YOUR variety cards → effects hit enemies ──
+  const playerVarEls=[...new Set(
+    playerActs.filter(a=>a.fighter.committed.some(c=>c.variety)).map(a=>a.fighter.el)
+  )];
+  let playerFired=false;
+  if(playerVarEls.length>=2){
+    if(playerVarEls.length>=3){
+      outer3p:
+      for(let i=0;i<playerVarEls.length-2;i++)
+        for(let j=i+1;j<playerVarEls.length-1;j++)
+          for(let k=j+1;k<playerVarEls.length;k++){
+            const key=reactionKey([playerVarEls[i],playerVarEls[j],playerVarEls[k]]);
+            if(REACTIONS[key]){
+              setTimeout(()=>fireReaction(key,player,enemy),800);
+              playerFired=true;
+              break outer3p;
+            }
+          }
+    }
+    if(!playerFired){
+      outer2p:
+      for(let i=0;i<playerVarEls.length-1;i++)
+        for(let j=i+1;j<playerVarEls.length;j++){
+          const key=reactionKey([playerVarEls[i],playerVarEls[j]]);
           if(REACTIONS[key]){
             setTimeout(()=>fireReaction(key,player,enemy),800);
-            return; // one reaction only
+            playerFired=true;
+            break outer2p;
+          }
+        }
+    }
+  }
+
+  // ── Bot reactions: only ENEMY variety cards → effects hit your team ──
+  const botVarEls=[...new Set(
+    botActs.filter(a=>a.fighter.committed.some(c=>c.variety)).map(a=>a.fighter.el)
+  )];
+  if(botVarEls.length<2)return;
+  const botDelay=playerFired?1600:800;
+  let botFired=false;
+  if(botVarEls.length>=3){
+    outer3b:
+    for(let i=0;i<botVarEls.length-2;i++)
+      for(let j=i+1;j<botVarEls.length-1;j++)
+        for(let k=j+1;k<botVarEls.length;k++){
+          const key=reactionKey([botVarEls[i],botVarEls[j],botVarEls[k]]);
+          if(REACTIONS[key]){
+            setTimeout(()=>fireBotReaction(key,enemy,player),botDelay);
+            botFired=true;
+            break outer3b;
           }
         }
   }
-  // Check 2-element
-  for(let i=0;i<allVarEls.length-1;i++)
-    for(let j=i+1;j<allVarEls.length;j++){
-      const key=reactionKey([allVarEls[i],allVarEls[j]]);
-      if(REACTIONS[key]){
-        setTimeout(()=>fireReaction(key,player,enemy),800);
-        return;
+  if(!botFired){
+    for(let i=0;i<botVarEls.length-1;i++)
+      for(let j=i+1;j<botVarEls.length;j++){
+        const key=reactionKey([botVarEls[i],botVarEls[j]]);
+        if(REACTIONS[key]){
+          setTimeout(()=>fireBotReaction(key,enemy,player),botDelay);
+          break;
+        }
       }
-    }
+  }
 }
 
 function fireReaction(key,player,enemy){
@@ -2450,6 +2481,16 @@ function fireReaction(key,player,enemy){
   showCombo(`${rx.emoji} ${rx.name}!`);
   playSound('ult');
   rx.fn(player,enemy);
+}
+
+// Bot reaction: same table but attacker=bot(enemy), target=player team
+// We swap the args so all reaction fns debuff/damage the player side
+function fireBotReaction(key,botSide,playerSide){
+  const rx=REACTIONS[key];if(!rx)return;
+  showCombo(`⚠️ ENEMY ${rx.emoji} ${rx.name}!`);
+  playSound('ult');
+  // Pass swapped: "player" arg = bot fighters (their buffs), "enemy" arg = your fighters (take the debuffs)
+  rx.fn(botSide,playerSide);
 }
 
 // Helper: pick reaction target based on stat criteria
@@ -3497,10 +3538,10 @@ const HTP_PAGES=[
   // 4 — Reactions
   `<div class="htp-section">
     <div class="htp-section-title">⚗️ Elemental Reactions</div>
-    <div class="htp-para">When fighters from <b>both teams</b> use <b>Variety cards (✦)</b> of different elements in the same round, an <b>Elemental Reaction</b> fires automatically after all actions resolve. <b>3-element reactions take priority</b> over 2-element ones.</div>
+    <div class="htp-para">When <b>your fighters</b> use <b>Variety cards (✦)</b> of 2 or more different elements in the same round, an <b>Elemental Reaction</b> fires automatically after all actions resolve. <b>3-element reactions take priority</b> over 2-element ones. The <b>enemy can also trigger reactions</b> against your team if their fighters use 2+ different-element Variety cards in the same round — so watch out!</div>
     <div class="htp-tip-box" style="margin-top:8px">
-      <p>💡 <b>Example — 2-Element:</b> Your <b style="color:var(--Havoc)">Camellya (Havoc)</b> plays Life Drain ✦ and the enemy <b style="color:var(--Glacio)">Sanhua (Glacio)</b> plays their Variety card → <b style="color:#64c8ff">💜❄️ Frozen Abyss</b> fires! Knocks an enemy card AND marks them for +10% incoming damage.</p>
-      <p style="margin-top:6px">💡 <b>Example — 3-Element:</b> Your <b style="color:var(--Havoc)">Camellya (Havoc)</b> + <b style="color:var(--Spectro)">Verina (Spectro)</b> play Variety cards, and the enemy <b style="color:var(--Glacio)">Baizhi (Glacio)</b> plays theirs → <b style="color:#64c8ff">💜🌟❄️ Shattered Eclipse</b> fires! Launches 3 crystal shards dealing 40 damage each to random enemies over 3 rounds. More elements = bigger reaction!</p>
+      <p>💡 <b>Example — 2-Element:</b> Your <b style="color:var(--Havoc)">Camellya (Havoc)</b> plays Life Drain ✦ and your <b style="color:var(--Glacio)">Sanhua (Glacio)</b> plays a Variety card → <b style="color:#64c8ff">💜❄️ Frozen Abyss</b> fires! Knocks an enemy card AND marks them for +10% incoming damage.</p>
+      <p style="margin-top:6px">💡 <b>Example — 3-Element:</b> Your <b style="color:var(--Havoc)">Camellya (Havoc)</b> + <b style="color:var(--Spectro)">Verina (Spectro)</b> + <b style="color:var(--Glacio)">Sanhua (Glacio)</b> all play Variety cards → <b style="color:#64c8ff">💜🌟❄️ Shattered Eclipse</b> fires! Launches 3 crystal shards dealing 40 damage each to random enemies over 3 rounds. More player elements = bigger reaction!</p>
     </div>
   </div>
   <div class="htp-section">
